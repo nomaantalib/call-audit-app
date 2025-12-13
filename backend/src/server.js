@@ -12,13 +12,9 @@ app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:5173" }));
 app.use(express.json());
 
 // ---------- MongoDB ----------
-mongoose
-  .connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("🗄️  MongoDB connected"))
-  .catch((err) => console.error("MongoDB error:", err));
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log("MongoDB connected"))
+    .catch((err) => console.error("MongoDB error:", err));  
 
 // ---------- Routes ----------
 app.use("/api/audit", auditRouter);
