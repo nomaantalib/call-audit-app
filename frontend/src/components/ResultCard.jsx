@@ -15,8 +15,11 @@ export default function ResultCard({ audit }) {
               <p className="text-sm font-medium text-purple-300 uppercase tracking-wider mb-1">Audit Report</p>
               <h3 className="text-3xl font-bold text-white tracking-tight">{audit.filename}</h3>
             </div>
-            <div className="px-4 py-2 bg-green-500/20 text-green-300 rounded-full text-xs font-bold uppercase tracking-wide border border-green-500/30">
-              Completed
+            <div className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide border 
+              ${audit.sentiment?.toLowerCase().includes('positive') ? 'bg-green-500/20 text-green-300 border-green-500/30' : 
+                audit.sentiment?.toLowerCase().includes('negative') ? 'bg-red-500/20 text-red-300 border-red-500/30' : 
+                'bg-blue-500/20 text-blue-300 border-blue-500/30'}`}>
+              {audit.sentiment || "Analyzed"}
             </div>
           </header>
 
