@@ -15,11 +15,17 @@ export default function ResultCard({ audit }) {
               <p className="text-sm font-medium text-purple-300 uppercase tracking-wider mb-1">Audit Report</p>
               <h3 className="text-3xl font-bold text-white tracking-tight">{audit.filename}</h3>
             </div>
-            <div className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide border 
-              ${audit.sentiment?.toLowerCase().includes('positive') ? 'bg-green-500/20 text-green-300 border-green-500/30' : 
-                audit.sentiment?.toLowerCase().includes('negative') ? 'bg-red-500/20 text-red-300 border-red-500/30' : 
-                'bg-blue-500/20 text-blue-300 border-blue-500/30'}`}>
-              {audit.sentiment || "Analyzed"}
+            <div className="flex items-center gap-4">
+              <div className="text-center">
+                <p className="text-sm text-gray-400">Score</p>
+                <p className="text-2xl font-bold text-white">{audit.score}/{audit.maxScore}</p>
+              </div>
+              <div className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wide border 
+                ${audit.sentiment?.toLowerCase().includes('positive') ? 'bg-green-500/20 text-green-300 border-green-500/30' : 
+                  audit.sentiment?.toLowerCase().includes('negative') ? 'bg-red-500/20 text-red-300 border-red-500/30' : 
+                  'bg-blue-500/20 text-blue-300 border-blue-500/30'}`}>
+                {audit.sentiment || "Analyzed"}
+              </div>
             </div>
           </header>
 
@@ -32,13 +38,13 @@ export default function ResultCard({ audit }) {
               </h4>
               <ul className="space-y-3">
                 {Array.isArray(audit.insights) && audit.insights.map((insight, idx) => (
-                  <li key={idx} className="flex items-start gap-3 text-gray-200">
+                  <li key={idx} className="flex items-start gap-3 text-gray-200 animate-fade-in" style={{ animationDelay: `${idx * 0.1}s` }}>
                     <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-blue-400 shrink-0"></span>
                     <span className="leading-relaxed">{insight}</span>
                   </li>
                 ))}
                 {!Array.isArray(audit.insights) && (
-                   <li className="text-gray-300 italic">{audit.insights}</li>
+                   <li className="text-gray-300 italic animate-fade-in">{audit.insights}</li>
                 )}
               </ul>
             </div>

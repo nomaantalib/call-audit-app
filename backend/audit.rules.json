@@ -1,0 +1,44 @@
+[
+  {
+    "id": "greeting",
+    "description": "Agent must greet the customer politely",
+    "weight": 10,
+    "severity": "HIGH"
+  },
+  {
+    "id": "listening",
+    "description": "Agent must actively listen and acknowledge customer concerns",
+    "weight": 15,
+    "severity": "HIGH"
+  },
+  {
+    "id": "empathy",
+    "description": "Agent must show empathy towards customer issues",
+    "weight": 10,
+    "severity": "MEDIUM"
+  },
+  {
+    "id": "resolution",
+    "description": "Agent must attempt to resolve the issue",
+    "weight": 20,
+    "severity": "HIGH"
+  },
+  {
+    "id": "closing",
+    "description": "Agent must close the call professionally",
+    "weight": 10,
+    "severity": "MEDIUM"
+  },
+  {
+    "id": "compliance",
+    "description": "Agent must comply with company policies",
+    "weight": 25,
+    "severity": "HIGH"
+  },
+  {
+    "id": "tone",
+    "description": "Agent must maintain professional tone",
+    "weight": 10,
+    "severity": "LOW"
+  }
+]
