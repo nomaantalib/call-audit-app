@@ -71,6 +71,11 @@ export default function UploadForm({ onResult }) {
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       const droppedFile = e.dataTransfer.files[0];
       if (droppedFile.type.startsWith("audio/")) {
+        if (droppedFile.size > 500 * 1024) {
+          setError("File exceeds the maximum size limit of 500 KB.");
+          setFile(null);
+          return;
+        }
         setFile(droppedFile);
         setError(null);
         setSuccess(false);
@@ -82,7 +87,16 @@ export default function UploadForm({ onResult }) {
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      const selectedFile = e.target.files[0];
+      if (selectedFile.size > 500 * 1024) {
+        setError("File exceeds the maximum size limit of 500 KB.");
+        setFile(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+        return;
+      }
+      setFile(selectedFile);
       setError(null);
       setSuccess(false);
     }
@@ -237,7 +251,7 @@ export default function UploadForm({ onResult }) {
                 {file.name}
               </span>
               <span className="text-xs text-gray-400 mb-4">
-                {(file.size / (1024 * 1024)).toFixed(2)} MB
+                {(file.size / 1024).toFixed(1)} KB
               </span>
               <button
                 onClick={removeFile}
@@ -256,7 +270,7 @@ export default function UploadForm({ onResult }) {
                 Select call audio or drag & drop here
               </span>
               <span className="text-xs text-gray-400 max-w-sm px-4 leading-normal mt-0.5">
-                Supports MP3, WAV, M4A, FLAC format call logs up to 25MB.
+                Supports MP3, WAV, M4A, FLAC format call logs up to 500 KB.
               </span>
             </div>
           )}

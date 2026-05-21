@@ -37,4 +37,19 @@ app.use((req, res, next) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });
 
+// Global error handling middleware (handles Multer LIMIT_FILE_SIZE and other errors)
+app.use((err, req, res, next) => {
+  if (err.code === "LIMIT_FILE_SIZE") {
+    return res.status(400).json({
+      success: false,
+      error: "Audio file size exceeds the maximum limit of 500 KB."
+    });
+  }
+  console.error("Global Error Handler:", err);
+  res.status(err.status || 500).json({
+    success: false,
+    error: err.message || "An unexpected server error occurred."
+  });
+});
+
 export default app;
