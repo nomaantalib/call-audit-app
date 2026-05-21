@@ -1,7 +1,7 @@
 
 import { Router } from "express";
 import upload from "../config/multer.config.js";
-import { auditCall, getAudits } from "../controllers/audit.controller.js";
+import { auditCall, getAudits, seedAudits } from "../controllers/audit.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
 
 const router = Router();
@@ -12,5 +12,6 @@ router.use(protect);
 // Route: /api/audit
 router.post("/", upload.single("audio"), auditCall);
 router.get("/", getAudits);
+router.post("/seed", seedAudits);
 
 export default router;

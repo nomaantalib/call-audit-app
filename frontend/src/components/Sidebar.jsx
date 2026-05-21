@@ -1,5 +1,5 @@
 import { 
-  Headphones, X, Award, History, Search, Clock, LogOut 
+  Headphones, X, Award, History, Search, Clock, LogOut, Sparkles, ArrowRight
 } from "lucide-react";
 
 export default function Sidebar({
@@ -8,7 +8,8 @@ export default function Sidebar({
   searchQuery, setSearchQuery,
   sentimentFilter, setSentimentFilter,
   sidebarOpen, setSidebarOpen,
-  formatDate, getSentimentIcon
+  formatDate, getSentimentIcon,
+  seedSampleData, seeding
 }) {
   return (
     <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
@@ -184,10 +185,59 @@ export default function Sidebar({
             </div>
           ) : filteredHistory.length === 0 ? (
             <div style={{
-              textAlign: "center", padding: "2.5rem 1rem", fontSize: 11, color: "#334155",
-              border: "1px dashed rgba(255,255,255,0.06)", borderRadius: 12
+              display: "flex", flexDirection: "column", alignItems: "center",
+              padding: "1.5rem 0.75rem", gap: "0.75rem",
+              border: "1px dashed rgba(139,92,246,0.15)", borderRadius: 12,
+              margin: "0.25rem 0"
             }}>
-              No records found
+              <div style={{
+                width: 40, height: 40, borderRadius: 12,
+                background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.2)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                color: "#a78bfa"
+              }}>
+                <Sparkles size={18} />
+              </div>
+              <div style={{ textAlign: "center" }}>
+                <p style={{ margin: 0, fontSize: 11, fontWeight: 800, color: "#94a3b8" }}>
+                  No audit records yet
+                </p>
+                <p style={{ margin: "0.25rem 0 0", fontSize: 9, color: "#334155", lineHeight: 1.5, fontWeight: 600 }}>
+                  Upload audio or load sample data to get started
+                </p>
+              </div>
+              {seedSampleData && (
+                <button
+                  onClick={seedSampleData}
+                  disabled={seeding}
+                  style={{
+                    display: "flex", alignItems: "center", gap: "0.35rem",
+                    padding: "0.45rem 0.85rem", borderRadius: 10,
+                    fontSize: 10, fontWeight: 800, cursor: seeding ? "not-allowed" : "pointer",
+                    opacity: seeding ? 0.5 : 1,
+                    background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.25)",
+                    color: "#c084fc", transition: "all 0.2s ease", fontFamily: "inherit"
+                  }}
+                  onMouseEnter={e => { if (!seeding) e.currentTarget.style.background = "rgba(139,92,246,0.18)"; }}
+                  onMouseLeave={e => { if (!seeding) e.currentTarget.style.background = "rgba(139,92,246,0.1)"; }}
+                >
+                  {seeding ? (
+                    <>
+                      <svg style={{ width: 12, height: 12, animation: "spin 0.8s linear infinite" }} fill="none" viewBox="0 0 24 24">
+                        <circle style={{ opacity: 0.25 }} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path style={{ opacity: 0.8 }} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Seeding...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles size={11} />
+                      Load Sandbox Samples
+                      <ArrowRight size={10} />
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           ) : (
             filteredHistory.map((item) => {

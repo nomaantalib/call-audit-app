@@ -20,6 +20,7 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sentimentFilter, setSentimentFilter] = useState("ALL");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [seeding, setSeeding] = useState(false);
 
   // Fetch past audits on user mount/change
   useEffect(() => {
@@ -30,6 +31,23 @@ export default function App() {
       setAudit(null);
     }
   }, [user]);
+
+  const seedSampleData = async () => {
+    setSeeding(true);
+    try {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+      const { data } = await axios.post(`${backendUrl}/api/audit/seed`);
+      if (data.success && data.audits && data.audits.length > 0) {
+        await fetchHistory();
+        setAudit(data.audits[0]);
+      }
+    } catch (error) {
+      console.error("Failed to seed sample audits:", error);
+      alert(error.response?.data?.error || "Failed to seed sample audits.");
+    } finally {
+      setSeeding(false);
+    }
+  };
 
   const fetchHistory = async () => {
     setLoadingHistory(true);
@@ -149,6 +167,8 @@ export default function App() {
         setSidebarOpen={setSidebarOpen}
         formatDate={formatDate}
         getSentimentIcon={getSentimentIcon}
+        seedSampleData={seedSampleData}
+        seeding={seeding}
       />
 
       {/* RIGHT COCKPIT CANVAS / WORKSPACE STAGE */}
@@ -178,7 +198,12 @@ export default function App() {
               <div className="w-full flex flex-col gap-8 items-center animate-fade-in">
                 <HeroBanner />
                 <div className="w-full max-w-xl">
-                  <UploadForm onResult={handleNewAudit} />
+                  <UploadForm 
+                    onResult={handleNewAudit} 
+                    seedSampleData={seedSampleData}
+                    seeding={seeding}
+                    hasAudits={history.length > 0}
+                  />
                 </div>
               </div>
             ) : (
