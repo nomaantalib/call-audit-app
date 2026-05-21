@@ -6,7 +6,7 @@
 The **Call Audit App** is a streamlined Quality Assurance (QA) platform designed to help supervisors and managers evaluate customer-agent interactions. This tool ensures compliance, tracks script adherence, and provides actionable insights to improve customer service standards.
 
 ---
- Deployed MVP - pending
+* **Live Deployed App:** [https://call-audit-app-brrj.onrender.com](https://call-audit-app-brrj.onrender.com)
 ##  Key Features
 
 - **Centralized Call Repository:** Easily access and review recorded calls or transcripts.
