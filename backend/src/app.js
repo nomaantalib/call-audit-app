@@ -3,6 +3,7 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import auditRoutes from "./routes/audit.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,6 +19,7 @@ app.use((req, res, next) => {
 app.use(cors()); // Allow all cors for now or configure as needed
 app.use(express.json());
 
+app.use("/api/auth", authRoutes);
 app.use("/api/audit", auditRoutes);
 
 app.get("/api/health", (req, res) => {

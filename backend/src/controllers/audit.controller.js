@@ -77,6 +77,7 @@ export const auditCall = async (req, res) => {
     // 7. Persist
     console.log("Step 6: Saving to database...");
     const audit = await Audit.create({
+      user: req.user._id,
       filename: req.file.originalname,
       transcript: transcriptText,
       utterances,
@@ -126,7 +127,7 @@ export const auditCall = async (req, res) => {
 
 export const getAudits = async (req, res) => {
   try {
-    const audits = await Audit.find().sort({ createdAt: -1 });
+    const audits = await Audit.find({ user: req.user.id }).sort({ createdAt: -1 });
     res.json({ success: true, audits });
   } catch (error) {
     console.error("Get Audits Error:", error.message);
