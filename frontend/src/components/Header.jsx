@@ -1,40 +1,93 @@
-import { Menu, Activity, Award } from "lucide-react";
+import { Menu, Activity, Award, Zap } from "lucide-react";
 
 export default function Header({ setSidebarOpen, audit, user }) {
   return (
-    <header className="border-b border-white/5 bg-[#080d1e]/80 backdrop-blur-xl sticky top-0 z-30 shadow-lg shadow-black/20 px-4 py-3 flex items-center justify-between xl:px-8 xl:py-4">
-      <div className="flex items-center gap-3">
-        {/* Hamburger button on mobile */}
-        <button 
+    <header style={{
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      padding: "0 1.5rem",
+      height: 56,
+      flexShrink: 0,
+      background: "rgba(6,9,20,0.85)",
+      backdropFilter: "blur(20px)",
+      WebkitBackdropFilter: "blur(20px)",
+      borderBottom: "1px solid rgba(255,255,255,0.05)",
+      boxShadow: "0 2px 20px rgba(0,0,0,0.3)",
+      position: "sticky",
+      top: 0,
+      zIndex: 30
+    }}>
+      {/* LEFT: hamburger + breadcrumb */}
+      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+        {/* Hamburger — visible on mobile only via CSS */}
+        <button
           onClick={() => setSidebarOpen(true)}
-          className="xl:hidden p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 border border-white/5 transition-all"
+          className="xl:hidden"
+          style={{
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 10, padding: "6px 8px",
+            cursor: "pointer", color: "#94a3b8",
+            display: "flex", alignItems: "center", justifyContent: "center"
+          }}
         >
-          <Menu className="w-5 h-5" />
+          <Menu size={18} />
         </button>
 
-        <div className="flex items-center gap-2.5">
-          <span className="text-xs font-black text-slate-500 uppercase tracking-widest hidden sm:inline">Active Area /</span>
-          <span className="text-xs font-black text-purple-300 uppercase tracking-wider flex items-center gap-1">
-            {audit ? (
-              <>
-                <Activity className="w-3.5 h-3.5 text-purple-400" /> Audit Assessment
-              </>
-            ) : (
-              <>
-                <Award className="w-3.5 h-3.5 text-purple-400" /> Call Auditor Stage
-              </>
-            )}
+        {/* Breadcrumb */}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <span style={{ fontSize: 11, color: "#334155", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            Dashboard /
+          </span>
+          <span style={{
+            display: "flex", alignItems: "center", gap: "0.3rem",
+            fontSize: 11, fontWeight: 800, color: "#a78bfa",
+            textTransform: "uppercase", letterSpacing: "0.07em"
+          }}>
+            {audit
+              ? <><Activity size={13} style={{ color: "#a78bfa" }} /> Audit Assessment</>
+              : <><Award size={13} style={{ color: "#a78bfa" }} /> Call Auditor Stage</>
+            }
           </span>
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider bg-green-500/10 text-green-300 border border-green-500/20">
-          <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-ping"></span> Live Connection
-        </span>
-        <div className="flex flex-col text-right">
-          <span className="text-[10px] font-black text-slate-200">{user?.name}</span>
-          <span className="text-[8px] text-gray-500 font-semibold">{user?.email}</span>
+      {/* RIGHT: status + user */}
+      <div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
+        {/* Live indicator */}
+        <div style={{
+          display: "flex", alignItems: "center", gap: "0.4rem",
+          padding: "4px 10px", borderRadius: 99,
+          background: "rgba(34,197,94,0.08)", border: "1px solid rgba(34,197,94,0.18)",
+          fontSize: 9, fontWeight: 900, color: "#4ade80",
+          textTransform: "uppercase", letterSpacing: "0.08em"
+        }}>
+          <span style={{
+            width: 6, height: 6, borderRadius: "50%",
+            background: "#4ade80",
+            boxShadow: "0 0 6px #4ade80",
+            animation: "pulse-slow 2s ease infinite"
+          }} />
+          Live
+        </div>
+
+        {/* Gemini badge */}
+        <div style={{
+          display: "flex", alignItems: "center", gap: "0.35rem",
+          padding: "4px 10px", borderRadius: 99,
+          background: "rgba(139,92,246,0.08)", border: "1px solid rgba(139,92,246,0.18)",
+          fontSize: 9, fontWeight: 900, color: "#c084fc",
+          textTransform: "uppercase", letterSpacing: "0.08em"
+        }}>
+          <Zap size={10} />
+          Gemini Pro
+        </div>
+
+        {/* User info */}
+        <div style={{ textAlign: "right", lineHeight: 1.3 }}>
+          <p style={{ margin: 0, fontSize: 11, fontWeight: 800, color: "#e2e8f0" }}>{user?.name}</p>
+          <p style={{ margin: 0, fontSize: 9, color: "#475569", fontWeight: 600 }}>{user?.email}</p>
         </div>
       </div>
     </header>

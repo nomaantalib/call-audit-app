@@ -118,7 +118,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#060814] text-slate-100 relative overflow-hidden selection:bg-purple-500 selection:text-white flex font-sans">
+    <div className="dashboard-shell text-slate-100 selection:bg-purple-500 selection:text-white font-sans">
       
       {/* Premium Aurora Background Lights (Fixed behind everything) */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
@@ -128,12 +128,10 @@ export default function App() {
       </div>
 
       {/* MOBILE BACKDROP OVERLAY */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 xl:hidden transition-all duration-300"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      <div 
+        className={`mobile-overlay ${sidebarOpen ? "visible" : ""}`}
+        onClick={() => setSidebarOpen(false)}
+      />
 
       {/* LEFT SIDEBAR (STICKY GLASS PANEL) */}
       <Sidebar
@@ -154,7 +152,7 @@ export default function App() {
       />
 
       {/* RIGHT COCKPIT CANVAS / WORKSPACE STAGE */}
-      <div className="flex-1 min-h-screen flex flex-col overflow-y-auto relative z-10">
+      <div className="stage">
         
         {/* MOBILE & TABLET HEADER BAR */}
         <Header 
@@ -164,57 +162,59 @@ export default function App() {
         />
 
         {/* WORKSPACE CONTENT CONSOLE */}
-        <main className="flex-1 w-full mx-auto px-4 py-8 flex flex-col gap-8 xl:px-8 max-w-6xl">
-          
-          {/* Global Quality Stats Panel (Symmetric Top Panel inside stage) */}
-          <StatsCockpit 
-            totalAudited={totalAudited} 
-            avgScore={avgScore} 
-            criticalViolations={criticalViolations} 
-          />
+        <div className="stage-body">
+          <main className="w-full mx-auto px-4 py-8 flex flex-col gap-8 xl:px-8 max-w-6xl">
+            
+            {/* Global Quality Stats Panel (Symmetric Top Panel inside stage) */}
+            <StatsCockpit 
+              totalAudited={totalAudited} 
+              avgScore={avgScore} 
+              criticalViolations={criticalViolations} 
+            />
 
-          {/* ACTIVE CONTENT VIEW */}
-          {!audit ? (
-            // DOCK STAGE VIEW 1: UPLOADER WIDGET
-            <div className="w-full flex flex-col gap-8 items-center animate-fade-in">
-              <HeroBanner />
-              <div className="w-full max-w-xl">
-                <UploadForm onResult={handleNewAudit} />
+            {/* ACTIVE CONTENT VIEW */}
+            {!audit ? (
+              // DOCK STAGE VIEW 1: UPLOADER WIDGET
+              <div className="w-full flex flex-col gap-8 items-center animate-fade-in">
+                <HeroBanner />
+                <div className="w-full max-w-xl">
+                  <UploadForm onResult={handleNewAudit} />
+                </div>
               </div>
-            </div>
-          ) : (
-            // DOCK STAGE VIEW 2: EVALUATION DETAIL REPORT
-            <div className="w-full flex flex-col gap-6 animate-fade-in items-center">
-              
-              {/* Breadcrumb back control */}
-              <div className="flex justify-between items-center w-full gap-4 px-1">
-                <button
-                  onClick={() => setAudit(null)}
-                  className="px-3.5 py-2 text-xs font-black text-purple-300 hover:text-white border border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/10 rounded-xl transition-all flex items-center gap-2 shadow-md shadow-purple-500/5 group"
-                >
-                  <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-                  <span>Back to Uploader</span>
-                </button>
+            ) : (
+              // DOCK STAGE VIEW 2: EVALUATION DETAIL REPORT
+              <div className="w-full flex flex-col gap-6 animate-fade-in items-center">
                 
-                <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest bg-white/[0.02] border border-white/5 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-inner">
-                  <SlidersHorizontal className="w-3.5 h-3.5 text-purple-400" /> Analysis Report # {audit._id?.slice(-6).toUpperCase()}
-                </span>
+                {/* Breadcrumb back control */}
+                <div className="flex justify-between items-center w-full gap-4 px-1">
+                  <button
+                    onClick={() => setAudit(null)}
+                    className="px-3.5 py-2 text-xs font-black text-purple-300 hover:text-white border border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/10 rounded-xl transition-all flex items-center gap-2 shadow-md shadow-purple-500/5 group"
+                  >
+                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                    <span>Back to Uploader</span>
+                  </button>
+                  
+                  <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest bg-white/[0.02] border border-white/5 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-inner">
+                    <SlidersHorizontal className="w-3.5 h-3.5 text-purple-400" /> Analysis Report # {audit._id?.slice(-6).toUpperCase()}
+                  </span>
+                </div>
+
+                {/* Comprehensive Result Assessment Card */}
+                <div className="w-full">
+                  <ResultCard audit={audit} />
+                </div>
+
               </div>
+            )}
 
-              {/* Comprehensive Result Assessment Card */}
-              <div className="w-full">
-                <ResultCard audit={audit} />
-              </div>
+          </main>
 
-            </div>
-          )}
-
-        </main>
-
-        {/* STICKY FOOTER IN THE CANVAS */}
-        <footer className="border-t border-white/5 py-4 text-center text-white/10 text-[10px] mt-auto bg-[#04060d]/50 tracking-wider font-semibold">
-          © {new Date().getFullYear()} AI Call Auditor Pro • Premium QA Compliance Systems
-        </footer>
+          {/* STICKY FOOTER IN THE CANVAS */}
+          <footer className="border-t border-white/5 py-4 text-center text-white/10 text-[10px] bg-[#04060d]/50 tracking-wider font-semibold">
+            © {new Date().getFullYear()} AI Call Auditor Pro • Premium QA Compliance Systems
+          </footer>
+        </div>
 
       </div>
     </div>
