@@ -3,6 +3,11 @@ import mongoose from "mongoose";
 
 const AuditSchema = new mongoose.Schema(
   {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     filename: { type: String, required: true },
     transcript: { type: String }, // Full transcript
     utterances: [
