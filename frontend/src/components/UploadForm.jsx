@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { 
   UploadCloud, FileAudio, AlertCircle, CheckCircle2, Trash2,
-  Activity, Sparkles, Server, Cpu, Database, Award
+  Activity, Sparkles, Server, Cpu, Database, Award, ArrowRight
 } from "lucide-react";
 
 const STAGES = [
@@ -150,42 +150,42 @@ export default function UploadForm({ onResult }) {
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto bg-white/5 backdrop-blur-xl p-6 md:p-8 rounded-2xl border border-white/10 shadow-2xl relative overflow-hidden transition-all duration-300 hover:border-white/20 select-none">
+    <div className="w-full max-w-xl mx-auto bg-slate-950/40 backdrop-blur-2xl p-6 md:p-8 rounded-2xl border border-white/10 shadow-2xl relative overflow-hidden transition-all duration-300 hover:border-white/15 select-none">
       {/* Decorative top gradient bar */}
-      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500"></div>
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500"></div>
 
-      <h2 className="text-2xl md:text-3xl font-extrabold text-center text-white mb-2 tracking-tight">
+      <h2 className="text-xl md:text-2xl font-black text-center text-white mb-2 tracking-tight">
         Call Compliance Auditor
       </h2>
-      <p className="text-xs md:text-sm text-gray-400 text-center mb-6">
+      <p className="text-xs text-slate-400 text-center mb-6 leading-relaxed">
         Analyze conversational patterns, compliance weights, and performance insights with AssemblyAI & Google Gemini.
       </p>
 
       {/* Main Drag-Drop or Processing Stage */}
       {loading ? (
         // ACTIVE LOADING & AI INTERACTION VIEW
-        <div className="p-6 border border-purple-500/20 bg-purple-500/[0.02] rounded-xl flex flex-col items-center animate-fade-in">
+        <div className="p-5 border border-purple-500/20 bg-purple-500/[0.02] rounded-xl flex flex-col items-center animate-fade-in">
           
           {/* Animated 3D Waveform rods */}
-          <div className="flex items-end justify-center gap-1.5 h-16 mb-6">
-            {[24, 40, 56, 32, 48, 64, 36, 20].map((height, i) => (
+          <div className="flex items-end justify-center gap-1.5 h-12 mb-6">
+            {[20, 36, 48, 28, 42, 54, 30, 16].map((height, i) => (
               <div
                 key={i}
-                className="w-1.5 bg-gradient-to-t from-purple-500 to-pink-500 rounded-full waveform-bar"
+                className="w-1.5 bg-gradient-to-t from-purple-500 via-pink-500 to-blue-400 rounded-full waveform-bar"
                 style={{ height: `${height}px`, animationDuration: `${0.8 + i * 0.1}s` }}
               ></div>
             ))}
           </div>
 
-          <div className="w-full flex items-center justify-between text-[11px] font-bold text-gray-400 mb-3 px-1">
-            <span className="uppercase tracking-widest text-purple-400 flex items-center gap-1">
-              <Activity className="w-3.5 h-3.5 animate-pulse" /> AI Engine Active
+          <div className="w-full flex items-center justify-between text-[10px] font-black text-slate-450 mb-3 px-1 uppercase tracking-wider">
+            <span className="text-purple-400 flex items-center gap-1">
+              <Activity className="w-3.5 h-3.5 animate-pulse" /> AI Engine Processing
             </span>
             <span>Elapsed: {formatElapsedTime(elapsedTime)}</span>
           </div>
 
           {/* Interactive Steps Checklist */}
-          <div className="w-full space-y-2.5 mb-2">
+          <div className="w-full space-y-2 mb-1">
             {STAGES.map((stage, idx) => {
               const StageIcon = stage.icon;
               const isPast = idx < activeStage;
@@ -193,25 +193,25 @@ export default function UploadForm({ onResult }) {
               return (
                 <div 
                   key={idx}
-                  className={`flex items-center gap-3 p-2.5 rounded-lg border text-xs transition-all duration-300
+                  className={`flex items-center gap-3 p-2.5 rounded-lg border text-[11px] transition-all duration-300
                     ${isPast 
-                      ? "bg-green-500/[0.02] border-green-500/20 text-green-300 font-semibold" 
+                      ? "bg-emerald-500/[0.02] border-emerald-500/20 text-emerald-300 font-semibold" 
                       : isActive 
                         ? "bg-purple-500/10 border-purple-500/40 text-purple-200 font-bold scale-[1.01] glow-purple" 
-                        : "bg-white/[0.01] border-white/5 text-gray-500"}`}
+                        : "bg-white/[0.01] border-white/5 text-slate-500"}`}
                 >
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border
                     ${isPast 
-                      ? "bg-green-500/15 border-green-500/30 text-green-400" 
+                      ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-400" 
                       : isActive 
                         ? "bg-purple-500/20 border-purple-500/40 text-purple-300 animate-spin" 
-                        : "bg-white/5 border-white/10 text-gray-500"}`}
+                        : "bg-white/5 border-white/10 text-slate-500"}`}
                   >
-                    {isPast ? <CheckCircle2 className="w-3.5 h-3.5" /> : <StageIcon className="w-3.5 h-3.5" />}
+                    {isPast ? <CheckCircle2 className="w-3 h-3" /> : <StageIcon className="w-3 h-3" />}
                   </div>
-                  <span className="flex-1 truncate">{stage.text}</span>
+                  <span className="flex-1 truncate font-medium">{stage.text}</span>
                   {isActive && (
-                    <span className="text-[10px] uppercase font-bold text-purple-400 tracking-wider animate-pulse">Running</span>
+                    <span className="text-[9px] uppercase font-black text-purple-400 tracking-widest animate-pulse">Running</span>
                   )}
                 </div>
               );
@@ -230,7 +230,7 @@ export default function UploadForm({ onResult }) {
             ${isDragActive 
               ? "border-purple-400 bg-purple-500/10 scale-[0.98]" 
               : file 
-                ? "border-green-500/40 bg-green-500/5 glow-green" 
+                ? "border-emerald-550 bg-emerald-500/5 glow-green" 
                 : "border-white/15 bg-white/5 hover:border-purple-500/50 hover:bg-white/[0.08]"}`}
         >
           <input
@@ -244,33 +244,33 @@ export default function UploadForm({ onResult }) {
 
           {file ? (
             <div className="flex flex-col items-center text-center animate-fade-in w-full">
-              <div className="w-16 h-16 rounded-2xl bg-green-500/20 flex items-center justify-center mb-3 text-green-400 group-hover:scale-110 transition-transform shadow-lg shadow-green-500/10 border border-green-500/30">
-                <FileAudio className="w-8 h-8" />
+              <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 flex items-center justify-center mb-3 text-emerald-400 group-hover:scale-110 transition-transform shadow-lg shadow-emerald-500/10 border border-emerald-500/30">
+                <FileAudio className="w-6 h-6" />
               </div>
-              <span className="text-base font-semibold text-white max-w-xs truncate mb-1">
+              <span className="text-sm font-bold text-white max-w-xs truncate mb-1">
                 {file.name}
               </span>
-              <span className="text-xs text-gray-400 mb-4">
-                {(file.size / 1024).toFixed(1)} KB
+              <span className="text-[10px] text-slate-400 mb-4 font-bold uppercase tracking-wider">
+                {(file.size / 1024).toFixed(1)} KB / 500 KB Max
               </span>
               <button
                 onClick={removeFile}
                 disabled={loading}
-                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-red-500/15 border border-red-500/30 text-xs font-bold text-red-300 hover:bg-red-500/35 transition-colors disabled:opacity-50"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-[10px] font-black text-red-400 hover:bg-red-500/20 transition-all disabled:opacity-50"
               >
-                <Trash2 className="w-3.5 h-3.5" /> Remove File
+                <Trash2 className="w-3 h-3" /> Remove File
               </button>
             </div>
           ) : (
             <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4 text-purple-300 group-hover:bg-purple-500/20 group-hover:text-purple-400 group-hover:scale-110 transition-all duration-300 border border-white/10 shadow-lg">
-                <UploadCloud className="w-8 h-8 animate-bounce" style={{ animationDuration: "3s" }} />
+              <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-4 text-purple-300 group-hover:bg-purple-500/20 group-hover:text-purple-400 group-hover:scale-110 transition-all duration-300 border border-white/10 shadow-lg">
+                <UploadCloud className="w-6 h-6 animate-bounce" style={{ animationDuration: "3s" }} />
               </div>
-              <span className="text-base font-bold text-white mb-1 group-hover:text-purple-300 transition-colors">
+              <span className="text-sm font-bold text-white mb-1 group-hover:text-purple-300 transition-colors">
                 Select call audio or drag & drop here
               </span>
-              <span className="text-xs text-gray-400 max-w-sm px-4 leading-normal mt-0.5">
-                Supports MP3, WAV, M4A, FLAC format call logs up to 500 KB.
+              <span className="text-[11px] text-slate-400 max-w-xs px-4 leading-normal mt-0.5 font-medium">
+                Supports MP3, WAV, M4A format call logs up to 500 KB limit.
               </span>
             </div>
           )}
@@ -280,13 +280,13 @@ export default function UploadForm({ onResult }) {
       {/* ERROR & STATUS MESSAGES */}
       <div className="mt-4 min-h-[28px] flex items-center justify-center text-center">
         {success && !loading && (
-          <div className="flex items-center gap-1.5 text-green-400 text-sm font-semibold animate-fade-in">
-            <CheckCircle2 className="w-4 h-4" /> Compliance audit completed!
+          <div className="flex items-center gap-1.5 text-emerald-400 text-xs font-black animate-fade-in uppercase tracking-wider">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Compliance audit completed!
           </div>
         )}
         {error && !loading && (
-          <div className="flex items-center gap-1.5 text-red-400 text-sm font-semibold p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 w-full justify-center animate-fade-in glow-red">
-            <AlertCircle className="w-4 h-4 shrink-0" /> {error}
+          <div className="flex items-center gap-1.5 text-red-400 text-xs font-bold p-3 rounded-lg bg-red-500/10 border border-red-500/20 w-full justify-center animate-fade-in glow-red">
+            <AlertCircle className="w-3.5 h-3.5 shrink-0" /> {error}
           </div>
         )}
       </div>
@@ -296,9 +296,10 @@ export default function UploadForm({ onResult }) {
         <button
           onClick={submit}
           disabled={!file || loading}
-          className="mt-2 w-full py-3.5 rounded-xl font-bold tracking-wide transition-all duration-300 select-none btn-primary disabled:opacity-40 disabled:cursor-not-allowed"
+          className="mt-2 w-full py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all duration-300 select-none btn-primary disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
         >
           Begin QA Compliance Audit
+          <ArrowRight className="w-3.5 h-3.5" />
         </button>
       )}
     </div>
