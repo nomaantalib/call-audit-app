@@ -2,25 +2,35 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import ResultCard from "./components/ResultCard";
 import UploadForm from "./components/UploadForm";
+import { useAuth } from "./context/AuthContext";
+import AuthForm from "./components/AuthForm";
 import { 
   History, Headphones, Calendar, Smile, Meh, Frown, 
   Search, Award, ChevronRight, Activity, BarChart3, 
-  ArrowLeft, SlidersHorizontal, ShieldAlert, Clock
+  ArrowLeft, SlidersHorizontal, ShieldAlert, Clock,
+  LogOut
 } from "lucide-react";
 
 export default function App() {
+  const { user, loading, logout } = useAuth();
   const [audit, setAudit] = useState(null);
   const [history, setHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [sentimentFilter, setSentimentFilter] = useState("ALL");
 
-  // Fetch past audits on mount
+  // Fetch past audits on user mount/change
   useEffect(() => {
-    fetchHistory();
-  }, []);
+    if (user) {
+      fetchHistory();
+    } else {
+      setHistory([]);
+      setAudit(null);
+    }
+  }, [user]);
 
   const fetchHistory = async () => {
+    setLoadingHistory(true);
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
       const { data } = await axios.get(`${backendUrl}/api/audit`);
@@ -89,6 +99,25 @@ export default function App() {
     return sum + highRisks;
   }, 0);
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#060814] flex flex-col items-center justify-center text-slate-100 font-sans relative overflow-hidden">
+        {/* Decorative ambient glowing orbs */}
+        <div className="absolute top-[-10%] left-[10%] w-[50%] h-[50%] bg-purple-600/10 rounded-full blur-[160px] animate-pulse-slow"></div>
+        <div className="absolute bottom-[-10%] right-[10%] w-[50%] h-[50%] bg-pink-600/8 rounded-full blur-[140px] animate-pulse-slow"></div>
+        
+        <div className="relative z-10 flex flex-col items-center gap-4 animate-pulse">
+          <Activity className="w-12 h-12 text-purple-400 animate-spin" />
+          <p className="text-sm font-semibold tracking-wider text-purple-300 uppercase">Configuring Secure Cockpit...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <AuthForm />;
+  }
+
   return (
     <div className="min-h-screen bg-[#060814] text-slate-100 relative overflow-x-hidden selection:bg-purple-500 selection:text-white flex flex-col font-sans">
       
@@ -119,9 +148,18 @@ export default function App() {
               </div>
             </div>
             
-            <div className="text-xs text-white/50 flex items-center gap-1.5 font-semibold bg-white/[0.03] px-3.5 py-1.5 rounded-full border border-white/5 shadow-inner">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
-              System Live
+            <div className="flex items-center gap-4">
+              <div className="hidden sm:flex flex-col text-right">
+                <span className="text-xs font-black text-slate-200">{user?.name}</span>
+                <span className="text-[10px] text-gray-500 font-semibold">{user?.email}</span>
+              </div>
+              <button 
+                onClick={logout}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-red-400 bg-red-500/10 hover:bg-red-500/15 border border-red-500/20 hover:border-red-500/30 transition-all shadow-sm"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Log Out</span>
+              </button>
             </div>
           </div>
         </header>
