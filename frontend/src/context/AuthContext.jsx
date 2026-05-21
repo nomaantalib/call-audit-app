@@ -3,7 +3,7 @@ import axios from "axios";
 
 const AuthContext = createContext();
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+const backendUrl = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? "http://localhost:5000" : "");
 
 // Add a global Axios request interceptor to inject JWT bearer token
 axios.interceptors.request.use(

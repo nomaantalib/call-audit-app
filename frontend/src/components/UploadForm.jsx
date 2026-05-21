@@ -78,7 +78,7 @@ export default function UploadForm({ onResult, seedSampleData, seeding, hasAudit
     try {
       const form = new FormData();
       form.append("audio", file);
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? "http://localhost:5000" : "");
       const { data } = await axios.post(`${backendUrl}/api/audit`, form);
       if (data.success && data.audit) { onResult(data.audit); setSuccess(true); }
       else throw new Error(data.error || "Analysis failed.");

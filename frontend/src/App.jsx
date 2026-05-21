@@ -32,7 +32,7 @@ export default function App() {
   const fetchHistory = async () => {
     setLoadingHistory(true);
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? "http://localhost:5000" : "");
       const { data } = await axios.get(`${backendUrl}/api/audit`);
       if (data.success && data.audits) setHistory(data.audits);
     } catch (err) {
@@ -45,7 +45,7 @@ export default function App() {
   const seedSampleData = async () => {
     setSeeding(true);
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? "http://localhost:5000" : "");
       const { data } = await axios.post(`${backendUrl}/api/audit/seed`);
       if (data.success && data.audits?.length > 0) {
         await fetchHistory();
