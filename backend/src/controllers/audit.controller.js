@@ -135,3 +135,13 @@ export const auditCall = async (req, res) => {
     res.status(500).json({ success: false, error: error.message || "Internal Server Error" });
   }
 };
+
+export const getAudits = async (req, res) => {
+  try {
+    const audits = await Audit.find().sort({ createdAt: -1 });
+    res.json({ success: true, audits });
+  } catch (error) {
+    console.error("Get Audits Error:", error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};

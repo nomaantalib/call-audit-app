@@ -1,13 +1,14 @@
 import express from "express";
 import cors from "cors";
-import auditRoutes from "./routes/audit.routes.js";
 import path from "path";
 import { fileURLToPath } from "url";
-
-const app = express();
+import auditRoutes from "./routes/audit.routes.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const frontendPath = path.join(__dirname, "../../frontend/dist");
+
+const app = express();
 
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
@@ -24,7 +25,6 @@ app.get("/api/health", (req, res) => {
 });
 
 // Serving Frontend static files
-const frontendPath = path.join(__dirname, "../../frontend/dist");
 app.use(express.static(frontendPath));
 
 // Fallback to serve index.html for any other routes
