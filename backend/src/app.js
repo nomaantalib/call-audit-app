@@ -22,8 +22,29 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/audit", auditRoutes);
 
+import fs from "fs";
+
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", message: "Server is healthy" });
+});
+
+app.get("/api/debug-files", (req, res) => {
+  try {
+    const assets = fs.existsSync(path.join(frontendPath, "assets"))
+      ? fs.readdirSync(path.join(frontendPath, "assets"))
+      : [];
+    const indexContent = fs.existsSync(path.join(frontendPath, "index.html"))
+      ? fs.readFileSync(path.join(frontendPath, "index.html"), "utf8")
+      : "Not found";
+    res.json({
+      frontendPath,
+      exists: fs.existsSync(frontendPath),
+      assets,
+      indexContent
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // Serving Frontend static files
