@@ -111,19 +111,7 @@ export const auditCall = async (req, res) => {
     console.log("Audit complete successfully.");
     res.json({
       success: true,
-      audit: {
-        id: audit._id,
-        filename: audit.filename,
-        score: audit.score,
-        maxScore: audit.maxScore,
-        ruleResults: audit.ruleResults,
-        risks: audit.risks,
-        coachingFeedback: audit.coachingFeedback,
-        insights: audit.coachingFeedback,
-        sentiment: audit.sentiment,
-        objective: audit.objective,
-        conclusion: audit.conclusion,
-      },
+      audit
     });
   } catch (error) {
     console.error("Audit Controller ERROR Stack:", error.stack || error);
