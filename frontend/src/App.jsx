@@ -8,9 +8,7 @@ import StatsCockpit from "./components/StatsCockpit";
 import Header from "./components/Header";
 import HeroBanner from "./components/HeroBanner";
 import { useAuth } from "./context/AuthContext";
-import { 
-  Smile, Meh, Frown, ArrowLeft, SlidersHorizontal, Activity 
-} from "lucide-react";
+import { Smile, Meh, Frown, ArrowLeft, SlidersHorizontal, Activity } from "lucide-react";
 
 export default function App() {
   const { user, loading, logout } = useAuth();
@@ -22,7 +20,6 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [seeding, setSeeding] = useState(false);
 
-  // Fetch past audits on user mount/change
   useEffect(() => {
     if (user) {
       fetchHistory();
@@ -32,55 +29,49 @@ export default function App() {
     }
   }, [user]);
 
-  const seedSampleData = async () => {
-    setSeeding(true);
-    try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
-      const { data } = await axios.post(`${backendUrl}/api/audit/seed`);
-      if (data.success && data.audits && data.audits.length > 0) {
-        await fetchHistory();
-        setAudit(data.audits[0]);
-      }
-    } catch (error) {
-      console.error("Failed to seed sample audits:", error);
-      alert(error.response?.data?.error || "Failed to seed sample audits.");
-    } finally {
-      setSeeding(false);
-    }
-  };
-
   const fetchHistory = async () => {
     setLoadingHistory(true);
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
       const { data } = await axios.get(`${backendUrl}/api/audit`);
-      if (data.success && data.audits) {
-        setHistory(data.audits);
-      }
-    } catch (error) {
-      console.error("Failed to load audit history:", error);
+      if (data.success && data.audits) setHistory(data.audits);
+    } catch (err) {
+      console.error("Failed to load audit history:", err);
     } finally {
       setLoadingHistory(false);
+    }
+  };
+
+  const seedSampleData = async () => {
+    setSeeding(true);
+    try {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+      const { data } = await axios.post(`${backendUrl}/api/audit/seed`);
+      if (data.success && data.audits?.length > 0) {
+        await fetchHistory();
+        setAudit(data.audits[0]);
+      }
+    } catch (err) {
+      console.error("Failed to seed:", err);
+      alert(err.response?.data?.error || "Failed to seed sample audits.");
+    } finally {
+      setSeeding(false);
     }
   };
 
   const handleNewAudit = (newAudit) => {
     setAudit(newAudit);
     setHistory((prev) => {
-      const exists = prev.some((item) => item._id === newAudit._id);
-      if (exists) return prev;
-      return [newAudit, ...prev];
+      const exists = prev.some((i) => i._id === newAudit._id);
+      return exists ? prev : [newAudit, ...prev];
     });
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+  const formatDate = (d) => {
+    if (!d) return "";
+    return new Date(d).toLocaleDateString("en-US", {
+      month: "short", day: "numeric",
+      hour: "2-digit", minute: "2-digit",
     });
   };
 
@@ -91,67 +82,48 @@ export default function App() {
     return <Meh className="w-4 h-4 text-blue-400 shrink-0" />;
   };
 
-  // Filtered History
   const filteredHistory = history.filter((item) => {
-    const matchesSearch = item.filename?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesSentiment = 
-      sentimentFilter === "ALL" || 
-      item.sentiment?.toUpperCase() === sentimentFilter;
-    return matchesSearch && matchesSentiment;
+    const matchSearch = item.filename?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchSentiment = sentimentFilter === "ALL" || item.sentiment?.toUpperCase() === sentimentFilter;
+    return matchSearch && matchSentiment;
   });
 
-  // Calculate dynamic analytics from history
+  // Analytics
   const totalAudited = history.length;
-  
   const avgScore = history.length > 0
-    ? Math.round(
-        history.reduce((sum, item) => {
-          const score = item.score ?? 0;
-          const max = item.maxScore || 100;
-          return sum + (score / max) * 100;
-        }, 0) / history.length
-      )
+    ? Math.round(history.reduce((sum, i) => sum + ((i.score ?? 0) / (i.maxScore || 100)) * 100, 0) / history.length)
     : 0;
-
-  const criticalViolations = history.reduce((sum, item) => {
-    const highRisks = item.risks?.filter((r) => r.severity?.toUpperCase() === "HIGH").length || 0;
-    return sum + highRisks;
-  }, 0);
+  const criticalViolations = history.reduce(
+    (sum, i) => sum + (i.risks?.filter((r) => r.severity?.toUpperCase() === "HIGH").length || 0), 0
+  );
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#060814] flex flex-col items-center justify-center text-slate-100 font-sans relative overflow-hidden">
-        <div className="absolute top-[-10%] left-[10%] w-[50%] h-[50%] bg-purple-600/10 rounded-full blur-[160px] animate-pulse-slow"></div>
-        <div className="absolute bottom-[-10%] right-[10%] w-[50%] h-[50%] bg-pink-600/8 rounded-full blur-[140px] animate-pulse-slow"></div>
-        <div className="relative z-10 flex flex-col items-center gap-4 animate-pulse">
-          <Activity className="w-12 h-12 text-purple-400 animate-spin" />
-          <p className="text-sm font-semibold tracking-wider text-purple-300 uppercase">Configuring Secure Cockpit...</p>
-        </div>
+      <div style={{ minHeight: "100vh", background: "#060814", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "1rem" }}>
+        <div style={{ position: "absolute", top: "-10%", left: "10%", width: "50%", height: "50%", background: "rgba(139,92,246,0.08)", borderRadius: "50%", filter: "blur(160px)" }} />
+        <Activity style={{ width: 40, height: 40, color: "#a78bfa", animation: "spin 1s linear infinite" }} />
+        <p style={{ fontSize: 12, fontWeight: 700, color: "#7c3aed", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+          Initialising Secure Cockpit…
+        </p>
       </div>
     );
   }
 
-  if (!user) {
-    return <AuthForm />;
-  }
+  if (!user) return <AuthForm />;
 
   return (
-    <div className="dashboard-shell text-slate-100 selection:bg-purple-500 selection:text-white font-sans">
-      
-      {/* Premium Aurora Background Lights (Fixed behind everything) */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-600/10 rounded-full blur-[160px] animate-pulse-slow"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-pink-600/8 rounded-full blur-[140px] animate-pulse-slow" style={{ animationDelay: "3s" }}></div>
-        <div className="absolute top-[30%] left-[30%] w-[40%] h-[40%] bg-blue-600/6 rounded-full blur-[150px] animate-pulse-slow" style={{ animationDelay: "6s" }}></div>
+    <div className="dashboard-shell">
+      {/* Aurora background orbs */}
+      <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0, overflow: "hidden" }}>
+        <div className="animate-pulse-slow" style={{ position: "absolute", top: "-15%", left: "-10%", width: "55%", height: "55%", background: "rgba(139,92,246,0.07)", borderRadius: "50%", filter: "blur(160px)" }} />
+        <div className="animate-pulse-slow" style={{ position: "absolute", bottom: "-15%", right: "-10%", width: "55%", height: "55%", background: "rgba(236,72,153,0.05)", borderRadius: "50%", filter: "blur(140px)", animationDelay: "3s" }} />
+        <div className="animate-pulse-slow" style={{ position: "absolute", top: "35%", left: "35%", width: "40%", height: "40%", background: "rgba(59,130,246,0.04)", borderRadius: "50%", filter: "blur(150px)", animationDelay: "6s" }} />
       </div>
 
-      {/* MOBILE BACKDROP OVERLAY */}
-      <div 
-        className={`mobile-overlay ${sidebarOpen ? "visible" : ""}`}
-        onClick={() => setSidebarOpen(false)}
-      />
+      {/* Mobile backdrop */}
+      <div className={`mobile-overlay ${sidebarOpen ? "visible" : ""}`} onClick={() => setSidebarOpen(false)} />
 
-      {/* LEFT SIDEBAR (STICKY GLASS PANEL) */}
+      {/* ── SIDEBAR ── */}
       <Sidebar
         user={user}
         logout={logout}
@@ -171,76 +143,87 @@ export default function App() {
         seeding={seeding}
       />
 
-      {/* RIGHT COCKPIT CANVAS / WORKSPACE STAGE */}
+      {/* ── STAGE (right panel) ── */}
       <div className="stage">
-        
-        {/* MOBILE & TABLET HEADER BAR */}
-        <Header 
-          setSidebarOpen={setSidebarOpen} 
-          audit={audit} 
-          user={user} 
-        />
 
-        {/* WORKSPACE CONTENT CONSOLE */}
+        {/* Sticky top header bar */}
+        <div className="stage-header">
+          <Header setSidebarOpen={setSidebarOpen} audit={audit} user={user} />
+        </div>
+
+        {/* Scrollable content body */}
         <div className="stage-body">
-          <main className="w-full mx-auto px-4 py-8 flex flex-col gap-8 xl:px-8 max-w-6xl">
-            
-            {/* Global Quality Stats Panel (Symmetric Top Panel inside stage) */}
-            <StatsCockpit 
-              totalAudited={totalAudited} 
-              avgScore={avgScore} 
-              criticalViolations={criticalViolations} 
+          <div className="stage-main">
+
+            {/* ── ANALYTICS COCKPIT ── */}
+            <StatsCockpit
+              totalAudited={totalAudited}
+              avgScore={avgScore}
+              criticalViolations={criticalViolations}
             />
 
-            {/* ACTIVE CONTENT VIEW */}
+            {/* ── MAIN WORKSPACE ── */}
             {!audit ? (
-              // DOCK STAGE VIEW 1: UPLOADER WIDGET
-              <div className="w-full flex flex-col gap-8 items-center animate-fade-in">
+              /* No audit selected → show upload + hero */
+              <div className="upload-wrapper animate-fade-in">
                 <HeroBanner />
-                <div className="w-full max-w-xl">
-                  <UploadForm 
-                    onResult={handleNewAudit} 
-                    seedSampleData={seedSampleData}
-                    seeding={seeding}
-                    hasAudits={history.length > 0}
-                  />
-                </div>
+                <UploadForm
+                  onResult={handleNewAudit}
+                  seedSampleData={seedSampleData}
+                  seeding={seeding}
+                  hasAudits={history.length > 0}
+                />
               </div>
             ) : (
-              // DOCK STAGE VIEW 2: EVALUATION DETAIL REPORT
-              <div className="w-full flex flex-col gap-6 animate-fade-in items-center">
-                
-                {/* Breadcrumb back control */}
-                <div className="flex justify-between items-center w-full gap-4 px-1">
+              /* Audit selected → show result card */
+              <div className="w-full animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%" }}>
+                {/* Breadcrumb row */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
                   <button
                     onClick={() => setAudit(null)}
-                    className="px-3.5 py-2 text-xs font-black text-purple-300 hover:text-white border border-purple-500/20 bg-purple-500/5 hover:bg-purple-500/10 rounded-xl transition-all flex items-center gap-2 shadow-md shadow-purple-500/5 group"
+                    style={{
+                      display: "flex", alignItems: "center", gap: "0.4rem",
+                      padding: "0.45rem 0.9rem", borderRadius: 12,
+                      fontSize: 11, fontWeight: 900, color: "#a78bfa",
+                      background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.2)",
+                      cursor: "pointer", transition: "all 0.2s ease", fontFamily: "inherit"
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(139,92,246,0.12)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(139,92,246,0.06)"; }}
                   >
-                    <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-                    <span>Back to Uploader</span>
+                    <ArrowLeft style={{ width: 14, height: 14 }} />
+                    Back to Uploader
                   </button>
-                  
-                  <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest bg-white/[0.02] border border-white/5 px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-inner">
-                    <SlidersHorizontal className="w-3.5 h-3.5 text-purple-400" /> Analysis Report # {audit._id?.slice(-6).toUpperCase()}
+
+                  <span style={{
+                    display: "flex", alignItems: "center", gap: "0.35rem",
+                    fontSize: 9, fontWeight: 900, color: "#475569",
+                    textTransform: "uppercase", letterSpacing: "0.1em",
+                    padding: "0.35rem 0.75rem", borderRadius: 10,
+                    background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)"
+                  }}>
+                    <SlidersHorizontal style={{ width: 12, height: 12, color: "#7c3aed" }} />
+                    Report #{audit._id?.slice(-6).toUpperCase()}
                   </span>
                 </div>
 
-                {/* Comprehensive Result Assessment Card */}
-                <div className="w-full">
-                  <ResultCard audit={audit} />
-                </div>
-
+                <ResultCard audit={audit} />
               </div>
             )}
 
-          </main>
-
-          {/* STICKY FOOTER IN THE CANVAS */}
-          <footer className="border-t border-white/5 py-4 text-center text-white/10 text-[10px] bg-[#04060d]/50 tracking-wider font-semibold">
-            © {new Date().getFullYear()} AI Call Auditor Pro • Premium QA Compliance Systems
-          </footer>
+            {/* Stage footer */}
+            <footer style={{
+              width: "100%", textAlign: "center",
+              padding: "1.25rem 0 1rem",
+              borderTop: "1px solid rgba(255,255,255,0.04)",
+              fontSize: 10, fontWeight: 700,
+              color: "rgba(255,255,255,0.08)",
+              letterSpacing: "0.08em", marginTop: "auto"
+            }}>
+              © {new Date().getFullYear()} AI Call Auditor Pro • Premium QA Compliance Systems
+            </footer>
+          </div>
         </div>
-
       </div>
     </div>
   );

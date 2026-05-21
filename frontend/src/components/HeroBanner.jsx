@@ -2,15 +2,49 @@ import { Award, Sparkles } from "lucide-react";
 
 export default function HeroBanner() {
   return (
-    <div className="text-center max-w-xl select-none">
-      <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-purple-500/10 border border-purple-500/20 text-purple-300 mb-5 shadow-lg shadow-purple-500/5 glow-purple">
-        <Award className="w-3 h-3 text-purple-400 animate-pulse" /> Gemini Pro Compliance Sandbox
+    <div className="hero-banner">
+      {/* Badge */}
+      <div style={{
+        display: "inline-flex", alignItems: "center", gap: "0.4rem",
+        padding: "0.35rem 0.9rem", borderRadius: 99,
+        background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.22)",
+        fontSize: 9, fontWeight: 900, color: "#c084fc",
+        textTransform: "uppercase", letterSpacing: "0.1em",
+        marginBottom: "0.9rem",
+        boxShadow: "0 4px 16px rgba(139,92,246,0.1)"
+      }}>
+        <Award style={{ width: 12, height: 12 }} className="animate-pulse-slow" />
+        Gemini Pro Compliance Sandbox
+        <Sparkles style={{ width: 11, height: 11, color: "#ec4899" }} />
       </div>
-      <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight leading-none bg-gradient-to-r from-white via-slate-200 to-slate-450 bg-clip-text text-transparent">
-        Intelligent Audio Compliance Auditing
+
+      {/* Headline */}
+      <h2 style={{
+        fontSize: "clamp(22px, 3vw, 32px)",
+        fontWeight: 900,
+        letterSpacing: "-0.5px",
+        lineHeight: 1.15,
+        margin: "0 0 0.75rem",
+        background: "linear-gradient(135deg, #ffffff 30%, #a78bfa 70%, #60a5fa 100%)",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        textAlign: "center"
+      }}>
+        Intelligent Audio<br />Compliance Auditing
       </h2>
-      <p className="text-slate-400 text-[11px] md:text-xs mt-3.5 leading-relaxed font-medium px-4">
-        Deploy advanced AI to extract compliance checkmarks, identify regulatory risks, score calls objectively, and produce custom coaching templates automatically.
+
+      {/* Subtitle */}
+      <p style={{
+        fontSize: 12,
+        color: "#475569",
+        lineHeight: 1.7,
+        fontWeight: 500,
+        maxWidth: 420,
+        textAlign: "center",
+        marginBottom: 0
+      }}>
+        Deploy advanced AI to extract compliance checkmarks, identify regulatory risks,
+        score calls objectively, and produce custom coaching templates automatically.
       </p>
     </div>
   );

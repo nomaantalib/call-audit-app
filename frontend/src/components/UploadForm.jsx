@@ -1,342 +1,306 @@
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
-import { 
+import {
   UploadCloud, FileAudio, AlertCircle, CheckCircle2, Trash2,
   Activity, Sparkles, Server, Cpu, Database, Award, ArrowRight
 } from "lucide-react";
 
 const STAGES = [
-  { text: "Connecting to secure upload pipeline...", icon: Server },
-  { text: "Transcribing call dialogue via AssemblyAI...", icon: Activity },
-  { text: "Normalizing conversation speakers & timing...", icon: Cpu },
-  { text: "Running Google Gemini compliance evaluation...", icon: Sparkles },
-  { text: "Extracting objective, conclusion, & sentiment...", icon: Database },
-  { text: "Generating custom representative coaching tips...", icon: Award }
+  { text: "Connecting to secure upload pipeline…",      icon: Server },
+  { text: "Transcribing call dialogue via AssemblyAI…", icon: Activity },
+  { text: "Normalising conversation speakers & timing…", icon: Cpu },
+  { text: "Running Google Gemini compliance evaluation…",icon: Sparkles },
+  { text: "Extracting objective, conclusion & sentiment…",icon: Database },
+  { text: "Generating coaching tips & risk summary…",   icon: Award },
 ];
 
 export default function UploadForm({ onResult, seedSampleData, seeding, hasAudits }) {
-  const [file, setFile] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState(null);
-  const [isDragActive, setIsDragActive] = useState(false);
+  const [file, setFile]               = useState(null);
+  const [loading, setLoading]         = useState(false);
+  const [success, setSuccess]         = useState(false);
+  const [error, setError]             = useState(null);
+  const [isDragActive, setDragActive] = useState(false);
   const [activeStage, setActiveStage] = useState(0);
-  const [elapsedTime, setElapsedTime] = useState(0);
-  const fileInputRef = useRef(null);
-  const timerRef = useRef(null);
-  const stageIntervalRef = useRef(null);
+  const [elapsed, setElapsed]         = useState(0);
+  const fileInputRef  = useRef(null);
+  const timerRef      = useRef(null);
+  const stageRef      = useRef(null);
 
   useEffect(() => {
     if (loading) {
-      // Elapsed timer
-      timerRef.current = setInterval(() => {
-        setElapsedTime((prev) => prev + 1);
-      }, 1000);
-
-      // Processing stage increments
-      stageIntervalRef.current = setInterval(() => {
-        setActiveStage((prev) => {
-          if (prev < STAGES.length - 1) return prev + 1;
-          return prev; // hold at last stage until response arrives
-        });
+      timerRef.current = setInterval(() => setElapsed(s => s + 1), 1000);
+      stageRef.current = setInterval(() => {
+        setActiveStage(s => s < STAGES.length - 1 ? s + 1 : s);
       }, 3500);
     } else {
       clearInterval(timerRef.current);
-      clearInterval(stageIntervalRef.current);
-      setElapsedTime(0);
+      clearInterval(stageRef.current);
+      setElapsed(0);
       setActiveStage(0);
     }
-
-    return () => {
-      clearInterval(timerRef.current);
-      clearInterval(stageIntervalRef.current);
-    };
+    return () => { clearInterval(timerRef.current); clearInterval(stageRef.current); };
   }, [loading]);
 
+  const fmt = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+
   const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setIsDragActive(true);
-    } else if (e.type === "dragleave") {
-      setIsDragActive(false);
-    }
+    e.preventDefault(); e.stopPropagation();
+    setDragActive(e.type === "dragenter" || e.type === "dragover");
   };
-
   const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragActive(false);
-    
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const droppedFile = e.dataTransfer.files[0];
-      if (droppedFile.type.startsWith("audio/")) {
-        if (droppedFile.size > 500 * 1024) {
-          setError("File exceeds the maximum size limit of 500 KB.");
-          setFile(null);
-          return;
-        }
-        setFile(droppedFile);
-        setError(null);
-        setSuccess(false);
-      } else {
-        setError("Please select a valid audio file (MP3, WAV, M4A, etc.)");
-      }
-    }
+    e.preventDefault(); e.stopPropagation(); setDragActive(false);
+    const f = e.dataTransfer.files?.[0];
+    if (!f) return;
+    if (!f.type.startsWith("audio/")) { setError("Please select a valid audio file (MP3, WAV, M4A)."); return; }
+    if (f.size > 500 * 1024) { setError("File exceeds the 500 KB limit."); return; }
+    setFile(f); setError(null); setSuccess(false);
   };
-
   const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
-      if (selectedFile.size > 500 * 1024) {
-        setError("File exceeds the maximum size limit of 500 KB.");
-        setFile(null);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
-        return;
-      }
-      setFile(selectedFile);
-      setError(null);
-      setSuccess(false);
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (f.size > 500 * 1024) {
+      setError("File exceeds the 500 KB limit.");
+      setFile(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
     }
+    setFile(f); setError(null); setSuccess(false);
   };
-
   const removeFile = (e) => {
     e.stopPropagation();
-    setFile(null);
-    setSuccess(false);
-    setError(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    setFile(null); setSuccess(false); setError(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const submit = async () => {
     if (!file) return;
-    setLoading(true);
-    setSuccess(false);
-    setError(null);
-
+    setLoading(true); setSuccess(false); setError(null);
     try {
       const form = new FormData();
       form.append("audio", file);
-
       const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
-      const { data } = await axios.post(
-        `${backendUrl}/api/audit`,
-        form
-      );
-
-      if (data.success && data.audit) {
-        onResult(data.audit);
-        setSuccess(true);
-      } else {
-        throw new Error(data.error || "Analysis completed but failed to return audit data.");
-      }
+      const { data } = await axios.post(`${backendUrl}/api/audit`, form);
+      if (data.success && data.audit) { onResult(data.audit); setSuccess(true); }
+      else throw new Error(data.error || "Analysis failed.");
     } catch (err) {
-      console.error(err);
-      const errorMessage = err.response?.data?.error || err.message || "Failed to analyze audio file.";
-      setError(errorMessage);
+      setError(err.response?.data?.error || err.message || "Failed to analyse audio file.");
     } finally {
       setLoading(false);
     }
   };
 
-  const formatElapsedTime = (secs) => {
-    const mins = Math.floor(secs / 60);
-    const remainingSecs = secs % 60;
-    return `${mins}:${remainingSecs.toString().padStart(2, '0')}`;
-  };
-
   return (
-    <div className="w-full flex flex-col gap-6 items-center">
-      <div className="w-full max-w-xl mx-auto bg-slate-950/40 backdrop-blur-2xl p-6 md:p-8 rounded-2xl border border-white/10 shadow-2xl relative overflow-hidden transition-all duration-300 hover:border-white/15 select-none">
-        {/* Decorative top gradient bar */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500"></div>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%", gap: "1rem" }}>
 
-        <h2 className="text-xl md:text-2xl font-black text-center text-white mb-2 tracking-tight">
+      {/* ── UPLOAD CARD ── */}
+      <div className="upload-card">
+        <div className="upload-card-bar" />
+
+        <h2 style={{ fontSize: 18, fontWeight: 900, textAlign: "center", color: "#f1f5f9", marginBottom: "0.35rem", letterSpacing: "-0.3px" }}>
           Call Compliance Auditor
         </h2>
-        <p className="text-xs text-slate-400 text-center mb-6 leading-relaxed">
-          Analyze conversational patterns, compliance weights, and performance insights with AssemblyAI & Google Gemini.
+        <p style={{ fontSize: 11, color: "#64748b", textAlign: "center", marginBottom: "1.25rem", lineHeight: 1.6, fontWeight: 500 }}>
+          Analyse conversational patterns, compliance weights, and performance insights
+          with AssemblyAI &amp; Google Gemini.
         </p>
 
-        {/* Main Drag-Drop or Processing Stage */}
         {loading ? (
-          // ACTIVE LOADING & AI INTERACTION VIEW
-          <div className="p-5 border border-purple-500/20 bg-purple-500/[0.02] rounded-xl flex flex-col items-center animate-fade-in">
-            
-            {/* Animated 3D Waveform rods */}
-            <div className="flex items-end justify-center gap-1.5 h-12 mb-6">
-              {[20, 36, 48, 28, 42, 54, 30, 16].map((height, i) => (
-                <div
-                  key={i}
-                  className="w-1.5 bg-gradient-to-t from-purple-500 via-pink-500 to-blue-400 rounded-full waveform-bar"
-                  style={{ height: `${height}px`, animationDuration: `${0.8 + i * 0.1}s` }}
-                ></div>
+          /* ── AI Processing View ── */
+          <div style={{ padding: "1.25rem", border: "1px solid rgba(139,92,246,0.2)", borderRadius: 14, background: "rgba(139,92,246,0.03)" }}>
+            {/* Waveform bars */}
+            <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", gap: 5, height: 44, marginBottom: "1.1rem" }}>
+              {[18, 34, 46, 26, 40, 52, 28, 16].map((h, i) => (
+                <div key={i} className="waveform-bar" style={{
+                  width: 5, height: h, borderRadius: 99,
+                  background: "linear-gradient(to top,#8b5cf6,#ec4899,#60a5fa)",
+                  animationDuration: `${0.8 + i * 0.1}s`
+                }} />
               ))}
             </div>
 
-            <div className="w-full flex items-center justify-between text-[10px] font-black text-slate-450 mb-3 px-1 uppercase tracking-wider">
-              <span className="text-purple-400 flex items-center gap-1">
-                <Activity className="w-3.5 h-3.5 animate-pulse" /> AI Engine Processing
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.85rem" }}>
+              <span style={{ display: "flex", alignItems: "center", gap: "0.3rem", fontSize: 9, fontWeight: 900, color: "#a78bfa", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                <Activity style={{ width: 12, height: 12 }} className="animate-pulse" /> AI Engine Processing
               </span>
-              <span>Elapsed: {formatElapsedTime(elapsedTime)}</span>
+              <span style={{ fontSize: 9, fontWeight: 700, color: "#475569" }}>Elapsed: {fmt(elapsed)}</span>
             </div>
 
-            {/* Interactive Steps Checklist */}
-            <div className="w-full space-y-2 mb-1">
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
               {STAGES.map((stage, idx) => {
-                const StageIcon = stage.icon;
-                const isPast = idx < activeStage;
-                const isActive = idx === activeStage;
+                const Icon = stage.icon;
+                const past   = idx < activeStage;
+                const active = idx === activeStage;
                 return (
-                  <div 
-                    key={idx}
-                    className={`flex items-center gap-3 p-2.5 rounded-lg border text-[11px] transition-all duration-300
-                      ${isPast 
-                        ? "bg-emerald-500/[0.02] border-emerald-500/20 text-emerald-300 font-semibold" 
-                        : isActive 
-                          ? "bg-purple-500/10 border-purple-500/40 text-purple-200 font-bold scale-[1.01] glow-purple" 
-                          : "bg-white/[0.01] border-white/5 text-slate-500"}`}
-                  >
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 border
-                      ${isPast 
-                        ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-400" 
-                        : isActive 
-                          ? "bg-purple-500/20 border-purple-500/40 text-purple-300 animate-spin" 
-                          : "bg-white/5 border-white/10 text-slate-500"}`}
-                    >
-                      {isPast ? <CheckCircle2 className="w-3 h-3" /> : <StageIcon className="w-3 h-3" />}
+                  <div key={idx} style={{
+                    display: "flex", alignItems: "center", gap: "0.65rem",
+                    padding: "0.55rem 0.75rem", borderRadius: 10,
+                    fontSize: 11, fontWeight: active ? 800 : 500,
+                    border: `1px solid ${past ? "rgba(34,197,94,0.2)" : active ? "rgba(139,92,246,0.35)" : "rgba(255,255,255,0.05)"}`,
+                    background: past ? "rgba(34,197,94,0.03)" : active ? "rgba(139,92,246,0.08)" : "transparent",
+                    color: past ? "#4ade80" : active ? "#c084fc" : "#334155",
+                    transform: active ? "scale(1.01)" : "scale(1)",
+                    transition: "all 0.3s ease"
+                  }}>
+                    <div style={{
+                      width: 20, height: 20, borderRadius: "50%", flexShrink: 0,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      border: `1px solid ${past ? "rgba(34,197,94,0.3)" : active ? "rgba(139,92,246,0.4)" : "rgba(255,255,255,0.08)"}`,
+                      background: past ? "rgba(34,197,94,0.1)" : active ? "rgba(139,92,246,0.15)" : "rgba(255,255,255,0.03)",
+                      animation: active ? "spin 1s linear infinite" : "none"
+                    }}>
+                      {past ? <CheckCircle2 style={{ width: 11, height: 11 }} /> : <Icon style={{ width: 11, height: 11 }} />}
                     </div>
-                    <span className="flex-1 truncate font-medium">{stage.text}</span>
-                    {isActive && (
-                      <span className="text-[9px] uppercase font-black text-purple-400 tracking-widest animate-pulse">Running</span>
-                    )}
+                    <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{stage.text}</span>
+                    {active && <span style={{ fontSize: 8, fontWeight: 900, color: "#7c3aed", textTransform: "uppercase", letterSpacing: "0.1em" }}>Running</span>}
                   </div>
                 );
               })}
             </div>
           </div>
         ) : (
-          // DEFAULT FILE UPLOAD AREA
+          /* ── Drop Zone ── */
           <div
-            onDragEnter={handleDrag}
-            onDragOver={handleDrag}
-            onDragLeave={handleDrag}
-            onDrop={handleDrop}
+            className={`upload-dropzone ${isDragActive ? "drag-active" : ""} ${file ? "has-file" : ""}`}
+            onDragEnter={handleDrag} onDragOver={handleDrag}
+            onDragLeave={handleDrag} onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
-            className={`flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-300 relative group
-              ${isDragActive 
-                ? "border-purple-400 bg-purple-500/10 scale-[0.98]" 
-                : file 
-                  ? "border-emerald-555 bg-emerald-500/5 glow-green" 
-                  : "border-white/15 bg-white/5 hover:border-purple-500/50 hover:bg-white/[0.08]"}`}
           >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="audio/*"
-              hidden
-              onChange={handleFileChange}
-              disabled={loading}
-            />
+            <input ref={fileInputRef} type="file" accept="audio/*" hidden onChange={handleFileChange} disabled={loading} />
 
             {file ? (
-              <div className="flex flex-col items-center text-center animate-fade-in w-full">
-                <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 flex items-center justify-center mb-3 text-emerald-400 group-hover:scale-110 transition-transform shadow-lg shadow-emerald-500/10 border border-emerald-500/30">
-                  <FileAudio className="w-6 h-6" />
+              /* File selected state */
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem", width: "100%" }}>
+                <div style={{
+                  width: 56, height: 56, borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center",
+                  background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.3)", color: "#4ade80",
+                  marginBottom: "0.2rem"
+                }}>
+                  <FileAudio style={{ width: 24, height: 24 }} />
                 </div>
-                <span className="text-sm font-bold text-white max-w-xs truncate mb-1">
+                <span style={{ fontSize: 13, fontWeight: 800, color: "#f1f5f9", maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {file.name}
                 </span>
-                <span className="text-[10px] text-slate-400 mb-4 font-bold uppercase tracking-wider">
-                  {(file.size / 1024).toFixed(1)} KB / 500 KB Max
+                <span style={{ fontSize: 10, color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em" }}>
+                  {(file.size / 1024).toFixed(1)} KB / 500 KB max
                 </span>
                 <button
                   onClick={removeFile}
-                  disabled={loading}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-[10px] font-black text-red-400 hover:bg-red-500/20 transition-all disabled:opacity-50"
+                  style={{
+                    display: "flex", alignItems: "center", gap: "0.35rem",
+                    padding: "0.35rem 0.75rem", borderRadius: 9,
+                    fontSize: 10, fontWeight: 800, cursor: "pointer",
+                    background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171",
+                    transition: "all 0.2s ease", marginTop: "0.25rem", fontFamily: "inherit"
+                  }}
                 >
-                  <Trash2 className="w-3 h-3" /> Remove File
+                  <Trash2 style={{ width: 12, height: 12 }} /> Remove
                 </button>
               </div>
             ) : (
-              <div className="flex flex-col items-center text-center">
-                <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center mb-4 text-purple-300 group-hover:bg-purple-500/20 group-hover:text-purple-400 group-hover:scale-110 transition-all duration-300 border border-white/10 shadow-lg">
-                  <UploadCloud className="w-6 h-6 animate-bounce" style={{ animationDuration: "3s" }} />
+              /* Empty state — centred icon + copy */
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.6rem" }}>
+                <div className="upload-icon-wrap">
+                  <UploadCloud style={{ width: 26, height: 26, animation: "bounce-slow 2.5s ease-in-out infinite" }} />
                 </div>
-                <span className="text-sm font-bold text-white mb-1 group-hover:text-purple-300 transition-colors">
-                  Select call audio or drag & drop here
-                </span>
-                <span className="text-[11px] text-slate-400 max-w-xs px-4 leading-normal mt-0.5 font-medium">
-                  Supports MP3, WAV, M4A format call logs up to 500 KB limit.
-                </span>
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.25rem" }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: "#f1f5f9" }}>
+                    Select call audio or drag &amp; drop
+                  </span>
+                  <span style={{ fontSize: 11, color: "#475569", fontWeight: 500, lineHeight: 1.5, textAlign: "center" }}>
+                    Supports MP3 · WAV · M4A · up to 500 KB
+                  </span>
+                </div>
               </div>
             )}
           </div>
         )}
 
-        {/* ERROR & STATUS MESSAGES */}
-        <div className="mt-4 min-h-[28px] flex items-center justify-center text-center">
+        {/* Status messages */}
+        <div style={{ minHeight: 28, display: "flex", alignItems: "center", justifyContent: "center", marginTop: "0.85rem" }}>
           {success && !loading && (
-            <div className="flex items-center gap-1.5 text-emerald-400 text-xs font-black animate-fade-in uppercase tracking-wider">
-              <CheckCircle2 className="w-3.5 h-3.5" /> Compliance audit completed!
+            <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: 11, fontWeight: 800, color: "#4ade80", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+              <CheckCircle2 style={{ width: 14, height: 14 }} /> Compliance audit completed!
             </div>
           )}
           {error && !loading && (
-            <div className="flex items-center gap-1.5 text-red-400 text-xs font-bold p-3 rounded-lg bg-red-500/10 border border-red-500/20 w-full justify-center animate-fade-in glow-red">
-              <AlertCircle className="w-3.5 h-3.5 shrink-0" /> {error}
+            <div style={{
+              display: "flex", alignItems: "center", gap: "0.5rem",
+              fontSize: 11, fontWeight: 700, color: "#f87171",
+              padding: "0.55rem 0.85rem", borderRadius: 10,
+              background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)",
+              width: "100%"
+            }}>
+              <AlertCircle style={{ width: 14, height: 14, flexShrink: 0 }} /> {error}
             </div>
           )}
         </div>
 
-        {/* SUBMIT BUTTON */}
+        {/* Submit button */}
         {!loading && (
           <button
             onClick={submit}
-            disabled={!file || loading}
-            className="mt-2 w-full py-3 rounded-xl font-black text-xs uppercase tracking-widest transition-all duration-300 select-none btn-primary disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+            disabled={!file}
+            className="btn-primary"
+            style={{
+              width: "100%", marginTop: "0.5rem",
+              padding: "0.8rem", fontSize: 11, letterSpacing: "0.1em",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: "0.4rem"
+            }}
           >
             Begin QA Compliance Audit
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight style={{ width: 14, height: 14 }} />
           </button>
         )}
       </div>
 
-      {/* SANDBOX SEEDER CARD */}
+      {/* ── SANDBOX SEEDER CARD (only when no audits exist) ── */}
       {!hasAudits && (
-        <div className="w-full max-w-xl bg-gradient-to-r from-purple-950/20 via-pink-950/10 to-blue-950/20 backdrop-blur-2xl p-5 rounded-2xl border border-purple-500/20 hover:border-purple-500/40 shadow-xl transition-all duration-300 animate-fade-in flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left select-none">
-          <div className="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 shrink-0 shadow-lg shadow-purple-500/5">
-            <Sparkles className="w-5.5 h-5.5 animate-pulse" />
+        <div style={{
+          width: "100%", maxWidth: 520,
+          display: "flex", alignItems: "center", gap: "1rem",
+          padding: "1rem 1.25rem", borderRadius: 16,
+          background: "linear-gradient(135deg,rgba(139,92,246,0.07),rgba(236,72,153,0.04),rgba(59,130,246,0.06))",
+          border: "1px solid rgba(139,92,246,0.2)",
+          backdropFilter: "blur(16px)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+          transition: "border-color 0.3s ease"
+        }}>
+          <div style={{
+            width: 40, height: 40, borderRadius: 12, flexShrink: 0,
+            background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.25)",
+            display: "flex", alignItems: "center", justifyContent: "center", color: "#a78bfa"
+          }}>
+            <Sparkles style={{ width: 18, height: 18 }} className="animate-pulse-slow" />
           </div>
-          <div className="flex-1">
-            <h4 className="text-xs font-black text-slate-100 uppercase tracking-wider mb-0.5">
-              Explore call audits immediately
-            </h4>
-            <p className="text-[10px] text-slate-400 font-medium leading-relaxed">
-              Don't have call recordings? Load 3 pre-analyzed audits to see compliance scores, PCI alerts, and coaching templates instantly.
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ margin: 0, fontSize: 11, fontWeight: 900, color: "#e2e8f0", marginBottom: "0.15rem" }}>
+              Explore call audits instantly
+            </p>
+            <p style={{ margin: 0, fontSize: 10, color: "#475569", fontWeight: 500, lineHeight: 1.5 }}>
+              Load 3 pre-analysed audits — compliance scores, PCI alerts &amp; coaching tips.
             </p>
           </div>
           <button
             onClick={seedSampleData}
             disabled={seeding}
-            className="px-4 py-2 text-[10px] font-black uppercase tracking-wider text-purple-300 hover:text-white border border-purple-500/30 bg-purple-500/5 hover:bg-purple-500/15 rounded-xl transition-all flex items-center gap-1.5 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed shadow-inner"
+            style={{
+              display: "flex", alignItems: "center", gap: "0.35rem",
+              padding: "0.5rem 0.9rem", borderRadius: 10, flexShrink: 0,
+              fontSize: 10, fontWeight: 900, cursor: seeding ? "not-allowed" : "pointer",
+              opacity: seeding ? 0.55 : 1,
+              background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.28)", color: "#c084fc",
+              transition: "all 0.2s ease", fontFamily: "inherit"
+            }}
+            onMouseEnter={e => { if (!seeding) { e.currentTarget.style.background = "rgba(139,92,246,0.2)"; e.currentTarget.style.color = "#e9d5ff"; } }}
+            onMouseLeave={e => { e.currentTarget.style.background = "rgba(139,92,246,0.1)"; e.currentTarget.style.color = "#c084fc"; }}
           >
             {seeding ? (
-              <>
-                <svg className="w-3.5 h-3.5 animate-spin text-purple-300 mr-1" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Seeding...
-              </>
+              <svg style={{ width: 14, height: 14, animation: "spin 0.8s linear infinite" }} fill="none" viewBox="0 0 24 24">
+                <circle style={{ opacity: 0.25 }} cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path style={{ opacity: 0.8 }} fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
             ) : (
-              <>
-                Seed Sandbox
-                <ArrowRight className="w-3 h-3" />
-              </>
+              <>Seed Sandbox <ArrowRight style={{ width: 12, height: 12 }} /></>
             )}
           </button>
         </div>

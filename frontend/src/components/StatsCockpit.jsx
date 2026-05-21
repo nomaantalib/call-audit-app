@@ -1,91 +1,123 @@
 import { BarChart3, Clock, Headphones, ShieldAlert, TrendingUp } from "lucide-react";
 
 export default function StatsCockpit({ totalAudited, avgScore, criticalViolations }) {
-  // Score-based coloring for average QA score
-  let scoreColor = "text-red-400";
-  let scoreGlow = "shadow-red-500/10";
-  let scoreProgressColor = "bg-gradient-to-r from-red-500 to-pink-500";
+  /* ── Score-based theming ── */
+  let scoreColor   = "#f87171";
+  let scoreBg      = "rgba(239,68,68,0.10)";
+  let scoreBorder  = "rgba(239,68,68,0.22)";
+  let scoreBar     = "linear-gradient(90deg,#ef4444,#f43f5e)";
   if (avgScore >= 80) {
-    scoreColor = "text-emerald-400";
-    scoreGlow = "shadow-emerald-500/10";
-    scoreProgressColor = "bg-gradient-to-r from-emerald-500 to-teal-500";
+    scoreColor  = "#4ade80";
+    scoreBg     = "rgba(34,197,94,0.10)";
+    scoreBorder = "rgba(34,197,94,0.22)";
+    scoreBar    = "linear-gradient(90deg,#22c55e,#10b981)";
   } else if (avgScore >= 50) {
-    scoreColor = "text-amber-400";
-    scoreGlow = "shadow-amber-500/10";
-    scoreProgressColor = "bg-gradient-to-r from-amber-500 to-orange-500";
+    scoreColor  = "#fbbf24";
+    scoreBg     = "rgba(245,158,11,0.10)";
+    scoreBorder = "rgba(245,158,11,0.22)";
+    scoreBar    = "linear-gradient(90deg,#f59e0b,#f97316)";
   }
 
-  // Violations-based coloring
-  const violationColor = criticalViolations > 0 ? "text-red-400" : "text-slate-400";
-  const violationBg = criticalViolations > 0 ? "bg-red-500/10 border-red-500/20" : "bg-white/[0.02] border-white/5";
+  const hasViolations = criticalViolations > 0;
 
   return (
-    <section className="w-full p-6 rounded-2xl bg-slate-950/40 border border-white/10 backdrop-blur-xl shadow-2xl transition-all duration-300 hover:border-white/15 relative overflow-hidden">
-      {/* Decorative backdrop glow */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl pointer-events-none" />
-      
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
-            <BarChart3 className="w-3.5 h-3.5 text-purple-400" />
+    <section style={{
+      width: "100%",
+      background: "rgba(9,14,33,0.55)",
+      backdropFilter: "blur(24px)",
+      WebkitBackdropFilter: "blur(24px)",
+      border: "1px solid rgba(255,255,255,0.07)",
+      borderRadius: 20,
+      padding: "1.25rem 1.5rem",
+      position: "relative",
+      overflow: "hidden",
+      boxShadow: "0 16px 48px rgba(0,0,0,0.45)"
+    }}>
+      {/* Decorative corner glow */}
+      <div style={{ position: "absolute", top: -24, right: -24, width: 120, height: 120, background: "rgba(139,92,246,0.07)", borderRadius: "50%", filter: "blur(32px)", pointerEvents: "none" }} />
+
+      {/* ── Section header ── */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.1rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <div style={{
+            width: 28, height: 28, borderRadius: 8,
+            background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.22)",
+            display: "flex", alignItems: "center", justifyContent: "center"
+          }}>
+            <BarChart3 style={{ width: 14, height: 14, color: "#a78bfa" }} />
           </div>
-          <h3 className="text-xs font-black text-slate-200 uppercase tracking-widest">
+          <span style={{ fontSize: 11, fontWeight: 900, color: "#e2e8f0", textTransform: "uppercase", letterSpacing: "0.1em" }}>
             QA Compliance Overview
-          </h3>
+          </span>
         </div>
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] text-slate-400 font-bold uppercase tracking-wider">
-          <TrendingUp className="w-3 h-3 text-purple-400" /> Real-time Analytics
+        <div style={{
+          display: "flex", alignItems: "center", gap: "0.35rem",
+          padding: "4px 10px", borderRadius: 99,
+          background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+          fontSize: 9, fontWeight: 800, color: "#64748b",
+          textTransform: "uppercase", letterSpacing: "0.08em"
+        }}>
+          <TrendingUp style={{ width: 11, height: 11, color: "#7c3aed" }} />
+          Real-time Analytics
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        
-        {/* Total Audits Card */}
-        <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex items-center gap-4 hover:bg-white/[0.04] hover:scale-[1.02] hover:border-blue-500/20 transition-all duration-300 shadow-lg shadow-black/25">
-          <div className="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0 shadow-lg shadow-blue-500/5">
-            <Clock className="w-5 h-5 animate-pulse" style={{ animationDuration: '4s' }} />
+      {/* ── Metrics grid ── */}
+      <div className="cockpit-grid">
+
+        {/* Total Audits */}
+        <div className="cockpit-card" style={{ borderColor: "rgba(59,130,246,0.15)" }}>
+          <div className="cockpit-card-icon" style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.2)" }}>
+            <Clock style={{ width: 20, height: 20, color: "#60a5fa" }} />
           </div>
-          <div>
-            <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider block mb-0.5">Total Audits</span>
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-black text-white tracking-tight">{totalAudited}</span>
-              <span className="text-[10px] font-bold text-slate-500">records</span>
+          <div className="cockpit-card-body">
+            <span className="cockpit-card-label">Total Audits</span>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "0.3rem" }}>
+              <span className="cockpit-card-value" style={{ color: "#f1f5f9" }}>{totalAudited}</span>
+              <span className="cockpit-card-sub">records</span>
             </div>
           </div>
         </div>
 
-        {/* Average QA Score Card */}
-        <div className="p-4 rounded-xl bg-white/[0.02] border border-white/5 flex flex-col justify-between hover:bg-white/[0.04] hover:scale-[1.02] hover:border-purple-500/20 transition-all duration-300 shadow-lg shadow-black/25 relative overflow-hidden group">
-          <div className="flex items-center gap-4">
-            <div className="w-11 h-11 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0 shadow-lg shadow-purple-500/5">
-              <Headphones className="w-5 h-5" />
+        {/* Average QA Score */}
+        <div className="cockpit-card" style={{ flexDirection: "column", alignItems: "flex-start", borderColor: scoreBorder, background: scoreBg }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem", width: "100%" }}>
+            <div className="cockpit-card-icon" style={{ background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.22)" }}>
+              <Headphones style={{ width: 20, height: 20, color: "#a78bfa" }} />
             </div>
-            <div>
-              <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider block mb-0.5">Average QA Score</span>
-              <span className={`text-2xl font-black tracking-tight ${scoreColor}`}>{avgScore}%</span>
+            <div className="cockpit-card-body">
+              <span className="cockpit-card-label">Average QA Score</span>
+              <div style={{ display: "flex", alignItems: "baseline", gap: "0.3rem" }}>
+                <span className="cockpit-card-value" style={{ color: scoreColor }}>{avgScore}</span>
+                <span className="cockpit-card-sub" style={{ color: scoreColor, opacity: 0.7 }}>%</span>
+              </div>
             </div>
           </div>
-          {/* Custom micro-progress bar embedded nicely at the bottom */}
-          <div className="mt-3 w-full">
-            <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/[0.03]">
-              <div 
-                className={`h-full rounded-full transition-all duration-500 ${scoreProgressColor}`} 
-                style={{ width: `${avgScore}%` }} 
-              />
-            </div>
+          {/* Progress bar */}
+          <div className="score-bar-track" style={{ marginTop: "0.65rem" }}>
+            <div className="score-bar-fill" style={{ width: `${avgScore}%`, background: scoreBar }} />
           </div>
         </div>
 
-        {/* Critical Violations Card */}
-        <div className={`p-4 rounded-xl ${violationBg} flex items-center gap-4 hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-black/25`}>
-          <div className={`w-11 h-11 rounded-xl ${criticalViolations > 0 ? 'bg-red-500/15 border-red-500/35 text-red-400 shadow-red-500/10 animate-bounce' : 'bg-slate-500/10 border-slate-500/20 text-slate-400'} border flex items-center justify-center shrink-0 shadow-lg`}>
-            <ShieldAlert className="w-5 h-5" />
+        {/* Critical Violations */}
+        <div className="cockpit-card" style={{
+          borderColor: hasViolations ? "rgba(239,68,68,0.25)" : "rgba(255,255,255,0.06)",
+          background: hasViolations ? "rgba(239,68,68,0.07)" : "rgba(255,255,255,0.02)"
+        }}>
+          <div className="cockpit-card-icon" style={{
+            background: hasViolations ? "rgba(239,68,68,0.12)" : "rgba(100,116,139,0.1)",
+            border: hasViolations ? "1px solid rgba(239,68,68,0.28)" : "1px solid rgba(100,116,139,0.2)",
+            animation: hasViolations ? "pulse-slow 1.8s ease-in-out infinite" : "none"
+          }}>
+            <ShieldAlert style={{ width: 20, height: 20, color: hasViolations ? "#f87171" : "#64748b" }} />
           </div>
-          <div>
-            <span className="text-[10px] text-slate-400 font-black uppercase tracking-wider block mb-0.5">Critical Violations</span>
-            <div className="flex items-baseline gap-1">
-              <span className={`text-2xl font-black tracking-tight ${violationColor}`}>{criticalViolations}</span>
-              <span className="text-[10px] font-bold text-slate-500">alerts</span>
+          <div className="cockpit-card-body">
+            <span className="cockpit-card-label">Critical Violations</span>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "0.3rem" }}>
+              <span className="cockpit-card-value" style={{ color: hasViolations ? "#f87171" : "#94a3b8" }}>
+                {criticalViolations}
+              </span>
+              <span className="cockpit-card-sub">alerts</span>
             </div>
           </div>
         </div>
