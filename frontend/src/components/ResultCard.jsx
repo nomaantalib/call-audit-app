@@ -2,12 +2,26 @@ import { useState } from "react";
 import { 
   Sparkles, Target, FileText, Smile, Meh, Frown, 
   CheckCircle2, XCircle, AlertTriangle, MessageSquare, 
-  Award, ChevronDown, ChevronUp, Clock, User, ClipboardList, Info
+  Award, ChevronDown, ChevronUp, Clock, User, ClipboardList, 
+  Info, Search, Mic, ArrowRight, Activity, Zap
 } from "lucide-react";
 
 export default function ResultCard({ audit }) {
   const [activeTab, setActiveTab] = useState("checklist");
   const [expandedRule, setExpandedRule] = useState(null);
+  
+  // Rules Filtering States
+  const [ruleFilter, setRuleFilter] = useState("ALL");
+  const [ruleSearch, setRuleSearch] = useState("");
+
+  // Risks Filtering States
+  const [riskSeverityFilter, setRiskSeverityFilter] = useState("ALL");
+  const [riskSearch, setRiskSearch] = useState("");
+
+  // Transcript Search and Filtration States
+  const [transcriptSearchTerm, setTranscriptSearchTerm] = useState("");
+  const [transcriptSpeakerFilter, setTranscriptSpeakerFilter] = useState("ALL");
+  const [highlightedUtteranceIndex, setHighlightedUtteranceIndex] = useState(null);
 
   if (!audit) return null;
 
@@ -15,19 +29,19 @@ export default function ResultCard({ audit }) {
   const isPositive = sentimentLower.includes("positive");
   const isNegative = sentimentLower.includes("negative");
 
-  // Determine sentiment icon and style
+  // Determine sentiment style
   let SentimentIcon = Meh;
-  let sentimentBadgeClass = "bg-blue-500/15 text-blue-300 border-blue-500/30";
-  let glowColorClass = "from-blue-500/10 to-transparent";
+  let sentimentBadgeClass = "bg-blue-500/10 text-blue-300 border-blue-500/25";
+  let glowColorClass = "from-blue-500/5 to-transparent";
 
   if (isPositive) {
     SentimentIcon = Smile;
-    sentimentBadgeClass = "bg-green-500/15 text-green-300 border-green-500/30";
-    glowColorClass = "from-green-500/10 to-transparent";
+    sentimentBadgeClass = "bg-green-500/10 text-green-300 border-green-500/25";
+    glowColorClass = "from-green-500/5 to-transparent";
   } else if (isNegative) {
     SentimentIcon = Frown;
-    sentimentBadgeClass = "bg-red-500/15 text-red-300 border-red-500/30";
-    glowColorClass = "from-red-500/10 to-transparent";
+    sentimentBadgeClass = "bg-red-500/10 text-red-300 border-red-500/25";
+    glowColorClass = "from-red-500/5 to-transparent";
   }
 
   const score = audit.score ?? 0;
@@ -37,16 +51,16 @@ export default function ResultCard({ audit }) {
   // Score color coding
   let scoreColorClass = "text-red-400";
   let scoreStrokeClass = "stroke-red-500";
-  let scoreBgClass = "bg-red-500/10 border-red-500/20";
+  let scoreBgClass = "bg-red-500/5 border-red-500/10";
   
   if (percentage >= 80) {
     scoreColorClass = "text-green-400";
     scoreStrokeClass = "stroke-green-500";
-    scoreBgClass = "bg-green-500/10 border-green-500/20";
+    scoreBgClass = "bg-green-500/5 border-green-500/10";
   } else if (percentage >= 50) {
     scoreColorClass = "text-amber-400";
     scoreStrokeClass = "stroke-amber-500";
-    scoreBgClass = "bg-amber-500/10 border-amber-500/20";
+    scoreBgClass = "bg-amber-500/5 border-amber-500/10";
   }
 
   // Circular progress math
@@ -59,24 +73,83 @@ export default function ResultCard({ audit }) {
   const coachingFeedback = audit.coachingFeedback || audit.coaching_feedback || [];
   const utterances = audit.utterances || [];
 
-  const passedCount = ruleResults.filter(r => r.passed).length;
-  const failedCount = ruleResults.length - passedCount;
+  // ----------------------------------------------------
+  // Dynamic Speech Metrics Calculations
+  // ----------------------------------------------------
+  const totalCallDuration = utterances.length > 0 ? utterances[utterances.length - 1].end : 0;
+  const totalDialogueTurns = utterances.length;
 
-  const toggleRule = (ruleId) => {
-    if (expandedRule === ruleId) {
-      setExpandedRule(null);
+  let agentSpeechTime = 0;
+  let customerSpeechTime = 0;
+  let agentWordCount = 0;
+  let customerWordCount = 0;
+
+  utterances.forEach((u) => {
+    const isAgent = u.speaker?.toUpperCase().includes("AGENT") || u.speaker?.toUpperCase().includes("A");
+    const duration = (u.end ?? 0) - (u.start ?? 0);
+    const words = u.text ? u.text.trim().split(/\s+/).length : 0;
+
+    if (isAgent) {
+      agentSpeechTime += duration;
+      agentWordCount += words;
     } else {
-      setExpandedRule(ruleId);
+      customerSpeechTime += duration;
+      customerWordCount += words;
     }
+  });
+
+  const totalSpeechTime = agentSpeechTime + customerSpeechTime;
+  const agentSpeechPct = totalSpeechTime > 0 ? Math.round((agentSpeechTime / totalSpeechTime) * 100) : 50;
+  const customerSpeechPct = totalSpeechTime > 0 ? 100 - agentSpeechPct : 50;
+
+  const agentWpm = agentSpeechTime > 0 ? Math.round(agentWordCount / (agentSpeechTime / 60)) : 0;
+  const customerWpm = customerSpeechTime > 0 ? Math.round(customerWordCount / (customerSpeechTime / 60)) : 0;
+
+  // ----------------------------------------------------
+  // Interactive Risk Navigation ("Jump to Transcript")
+  // ----------------------------------------------------
+  const parseTimestampToSeconds = (ts) => {
+    if (!ts) return 0;
+    const parts = ts.trim().split(":");
+    if (parts.length === 2) {
+      return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+    }
+    return parseFloat(ts) || 0;
   };
 
-  const getSeverityClass = (severity) => {
-    const s = severity?.toLowerCase() || "";
-    if (s.includes("high")) return "bg-red-500/20 text-red-300 border-red-500/30";
-    if (s.includes("medium")) return "bg-amber-500/20 text-amber-300 border-amber-500/30";
-    return "bg-blue-500/20 text-blue-300 border-blue-500/30";
+  const handleJumpToTranscript = (timestampStr) => {
+    const targetSeconds = parseTimestampToSeconds(timestampStr);
+    
+    // Find closest utterance matching timestamp
+    let closestIndex = 0;
+    let minDifference = Infinity;
+
+    utterances.forEach((u, index) => {
+      const diff = Math.abs(u.start - targetSeconds);
+      if (diff < minDifference) {
+        minDifference = diff;
+        closestIndex = index;
+      }
+    });
+
+    // Navigate to transcript tab
+    setActiveTab("transcript");
+    // Highlight utterance
+    setHighlightedUtteranceIndex(closestIndex);
+    // Reset filters that could hide our destination target
+    setTranscriptSpeakerFilter("ALL");
+    setTranscriptSearchTerm("");
+
+    // Timeout to let DOM load state then smooth scroll
+    setTimeout(() => {
+      const element = document.getElementById(`utterance-bubble-${closestIndex}`);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 200);
   };
 
+  // Helper to format timestamps nicely
   const formatTime = (seconds) => {
     if (seconds == null || isNaN(seconds)) return "00:00";
     const mins = Math.floor(seconds / 60);
@@ -84,350 +157,603 @@ export default function ResultCard({ audit }) {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Helper to highlight matching words in transcript
+  const getHighlightedText = (text, highlight) => {
+    if (!highlight || !highlight.trim()) return text;
+    try {
+      const regex = new RegExp(`(${highlight.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')})`, "gi");
+      const parts = text.split(regex);
+      return (
+        <span>
+          {parts.map((part, i) => 
+            regex.test(part) ? (
+              <mark key={i} className="bg-yellow-400/30 text-yellow-200 border-b border-yellow-400 font-bold px-0.5 rounded">{part}</mark>
+            ) : (
+              part
+            )
+          )}
+        </span>
+      );
+    } catch {
+      return text;
+    }
+  };
+
+  // ----------------------------------------------------
+  // Dynamic Tab Filters
+  // ----------------------------------------------------
+  const filteredRuleResults = ruleResults.filter((rule) => {
+    const matchesSearch = rule.ruleId?.toLowerCase().includes(ruleSearch.toLowerCase()) || 
+                          rule.description?.toLowerCase().includes(ruleSearch.toLowerCase());
+    const matchesStatus = ruleFilter === "ALL" || 
+                          (ruleFilter === "PASSED" && rule.passed) || 
+                          (ruleFilter === "FAILED" && !rule.passed);
+    return matchesSearch && matchesStatus;
+  });
+
+  const filteredRisks = risks.filter((risk) => {
+    const matchesSearch = risk.reason?.toLowerCase().includes(riskSearch.toLowerCase());
+    const matchesSeverity = riskSeverityFilter === "ALL" || 
+                            risk.severity?.toUpperCase() === riskSeverityFilter;
+    return matchesSearch && matchesSeverity;
+  });
+
+  const filteredUtterances = utterances.filter((utt) => {
+    const isAgent = utt.speaker?.toUpperCase().includes("AGENT") || utt.speaker?.toUpperCase().includes("A");
+    
+    const matchesSpeaker = transcriptSpeakerFilter === "ALL" || 
+                           (transcriptSpeakerFilter === "AGENT" && isAgent) || 
+                           (transcriptSpeakerFilter === "CUSTOMER" && !isAgent);
+                           
+    const matchesText = !transcriptSearchTerm || 
+                        utt.text?.toLowerCase().includes(transcriptSearchTerm.toLowerCase());
+                        
+    return matchesSpeaker && matchesText;
+  });
+
+  const totalRules = ruleResults.length;
+  const passedCount = ruleResults.filter(r => r.passed).length;
+  const failedCount = totalRules - passedCount;
+
   return (
     <div className="w-full max-w-4xl mx-auto mt-6 animate-fade-in relative select-none">
-      {/* Ambient Sentiment Glow in the Background */}
-      <div className={`absolute -inset-1 rounded-2xl bg-gradient-to-tr ${glowColorClass} opacity-40 blur-xl pointer-events-none`}></div>
+      {/* Ambient Sentiment Glow Backdrop */}
+      <div className={`absolute -inset-1 rounded-2xl bg-gradient-to-tr ${glowColorClass} opacity-30 blur-2xl pointer-events-none`}></div>
 
-      <div className="glass p-6 md:p-8 rounded-2xl relative overflow-hidden border border-white/10 shadow-2xl bg-white/[0.03]">
-        <div className="relative z-10">
+      <div className="glass p-6 md:p-8 rounded-2xl relative overflow-hidden border border-white/10 shadow-2xl bg-white/[0.02]">
+        
+        {/* Header Row */}
+        <header className="mb-6 border-b border-white/5 pb-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <p className="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-1 flex items-center gap-1.5 animate-pulse">
+              <ClipboardList className="w-3.5 h-3.5" /> Call Quality Audit Report
+            </p>
+            <h3 className="text-xl md:text-2xl font-black text-white tracking-tight leading-none">
+              {audit.filename}
+            </h3>
+          </div>
           
-          {/* Header Row */}
-          <header className="mb-8 border-b border-white/10 pb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <p className="text-xs font-bold text-purple-400 uppercase tracking-widest mb-1.5 flex items-center gap-1">
-                <ClipboardList className="w-3.5 h-3.5" /> Compliance Audit Report
-              </p>
-              <h3 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-tight">
-                {audit.filename}
-              </h3>
-            </div>
+          <div className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-black border uppercase tracking-wider self-start sm:self-auto shadow-inner ${sentimentBadgeClass}`}>
+            <SentimentIcon className="w-4 h-4" />
+            <span>{audit.sentiment || "Neutral"} Sentiment</span>
+          </div>
+        </header>
+
+        {/* OVERVIEW PANEL: Score + Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+          
+          {/* Circular Score Circle */}
+          <div className={`flex flex-col items-center justify-center p-5 rounded-2xl border ${scoreBgClass} backdrop-blur-sm relative overflow-hidden`}>
+            <div className="absolute top-0 right-0 p-1 text-white/5 font-black text-6xl pointer-events-none uppercase select-none">QA</div>
             
-            <div className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-bold border self-start sm:self-auto uppercase tracking-wider ${sentimentBadgeClass}`}>
-              <SentimentIcon className="w-4 h-4" />
-              <span>{audit.sentiment || "Neutral"} Sentiment</span>
-            </div>
-          </header>
-
-          {/* OVERVIEW PANEL: Score + Quick Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            
-            {/* Visual Circular Score Card */}
-            <div className={`flex flex-col items-center justify-center p-6 rounded-2xl border ${scoreBgClass} backdrop-blur-sm relative overflow-hidden`}>
-              <div className="absolute top-0 right-0 p-2.5 text-white/5 font-black text-6xl pointer-events-none uppercase">Score</div>
-              
-              <div className="relative w-24 h-24 mb-3">
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                  {/* Track circle */}
-                  <circle
-                    className="text-white/5 stroke-current"
-                    strokeWidth="8"
-                    cx="50"
-                    cy="50"
-                    r={radius}
-                    fill="transparent"
-                  />
-                  {/* Progress circle */}
-                  <circle
-                    className={`${scoreStrokeClass} stroke-current transition-all duration-1000 ease-out`}
-                    strokeWidth="8"
-                    strokeDasharray={circumference}
-                    strokeDashoffset={strokeDashoffset}
-                    strokeLinecap="round"
-                    cx="50"
-                    cy="50"
-                    r={radius}
-                    fill="transparent"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className={`text-2xl font-black ${scoreColorClass}`}>{percentage}%</span>
-                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Passed</span>
-                </div>
-              </div>
-
-              <div className="text-center">
-                <span className="text-xs font-bold text-gray-300 block">Compliance Score</span>
-                <span className="text-[11px] text-gray-400 font-semibold">{score} / {maxScore} total weight</span>
+            <div className="relative w-20 h-20 mb-2.5">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                <circle
+                  className="text-white/5 stroke-current"
+                  strokeWidth="8"
+                  cx="50"
+                  cy="50"
+                  r={radius}
+                  fill="transparent"
+                />
+                <circle
+                  className={`${scoreStrokeClass} stroke-current transition-all duration-1000 ease-out`}
+                  strokeWidth="8"
+                  strokeDasharray={circumference}
+                  strokeDashoffset={strokeDashoffset}
+                  strokeLinecap="round"
+                  cx="50"
+                  cy="50"
+                  r={radius}
+                  fill="transparent"
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className={`text-xl font-black leading-none ${scoreColorClass}`}>{percentage}%</span>
+                <span className="text-[8px] text-gray-400 font-black uppercase tracking-wider mt-0.5">Score</span>
               </div>
             </div>
 
-            {/* Quick Summary Block: Objective and Conclusion */}
-            <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="glass-card p-5 rounded-2xl hover:bg-white/5 border border-white/5 flex flex-col justify-between">
-                <div>
-                  <h4 className="text-xs font-black uppercase text-purple-400 tracking-wider mb-2 flex items-center gap-1.5">
-                    <Target className="w-3.5 h-3.5" /> Call Objective
-                  </h4>
-                  <p className="text-gray-200 text-xs md:text-sm leading-relaxed line-clamp-3">
-                    {audit.objective || "No objective extracted."}
-                  </p>
-                </div>
-                <div className="text-[10px] text-purple-300/60 font-semibold mt-3">Verified by AI Quality Auditor</div>
-              </div>
-
-              <div className="glass-card p-5 rounded-2xl hover:bg-white/5 border border-white/5 flex flex-col justify-between">
-                <div>
-                  <h4 className="text-xs font-black uppercase text-pink-400 tracking-wider mb-2 flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5" /> Conclusion
-                  </h4>
-                  <p className="text-gray-200 text-xs md:text-sm leading-relaxed line-clamp-3">
-                    {audit.conclusion || "No conclusion provided."}
-                  </p>
-                </div>
-                <div className="text-[10px] text-pink-300/60 font-semibold mt-3">Executive Summary</div>
-              </div>
+            <div className="text-center">
+              <span className="text-xs font-bold text-gray-300 block">Compliance Audit</span>
+              <span className="text-[10px] text-gray-400 font-semibold">{score} / {maxScore} points weight</span>
             </div>
-
           </div>
 
-          {/* TAB SYSTEM NAVIGATION */}
-          <div className="flex border-b border-white/10 mb-6 overflow-x-auto gap-2 scrollbar-none">
-            <button
-              onClick={() => setActiveTab("checklist")}
-              className={`pb-3 px-4 text-xs font-bold tracking-wider uppercase border-b-2 transition-all shrink-0 flex items-center gap-1.5
-                ${activeTab === "checklist"
-                  ? "border-purple-500 text-purple-400 font-extrabold"
-                  : "border-transparent text-gray-400 hover:text-white"}`}
-            >
-              <ClipboardList className="w-4 h-4" />
-              Rules Compliance ({passedCount}/{ruleResults.length})
-            </button>
-            
-            <button
-              onClick={() => setActiveTab("risks")}
-              className={`pb-3 px-4 text-xs font-bold tracking-wider uppercase border-b-2 transition-all shrink-0 flex items-center gap-1.5
-                ${activeTab === "risks"
-                  ? "border-purple-500 text-purple-400 font-extrabold"
-                  : "border-transparent text-gray-400 hover:text-white"}`}
-            >
-              <AlertTriangle className="w-4 h-4" />
-              Flagged Risks ({risks.length})
-            </button>
+          {/* New Speech Balance & Metrics widget */}
+          <div className="md:col-span-2 p-5 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col justify-between">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-[10px] font-black uppercase text-purple-400 tracking-widest flex items-center gap-1.5">
+                <Mic className="w-3.5 h-3.5" /> Dialogue Metrics
+              </h4>
+              <span className="text-[10px] text-gray-400 font-bold flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5 text-purple-400" /> {formatTime(totalCallDuration)} duration
+              </span>
+            </div>
 
-            <button
-              onClick={() => setActiveTab("coaching")}
-              className={`pb-3 px-4 text-xs font-bold tracking-wider uppercase border-b-2 transition-all shrink-0 flex items-center gap-1.5
-                ${activeTab === "coaching"
-                  ? "border-purple-500 text-purple-400 font-extrabold"
-                  : "border-transparent text-gray-400 hover:text-white"}`}
-            >
-              <Sparkles className="w-4 h-4" />
-              Coaching ({coachingFeedback.length})
-            </button>
+            {/* Talk Time Balance Gauge Bar */}
+            <div className="w-full bg-white/5 rounded-xl p-3 border border-white/[0.03]">
+              <div className="flex justify-between text-[10px] font-black text-gray-400 mb-2">
+                <span className="text-purple-300">Agent Talk Time ({agentSpeechPct}%)</span>
+                <span className="text-blue-300">Customer Talk Time ({customerSpeechPct}%)</span>
+              </div>
 
-            <button
-              onClick={() => setActiveTab("transcript")}
-              className={`pb-3 px-4 text-xs font-bold tracking-wider uppercase border-b-2 transition-all shrink-0 flex items-center gap-1.5
-                ${activeTab === "transcript"
-                  ? "border-purple-500 text-purple-400 font-extrabold"
-                  : "border-transparent text-gray-400 hover:text-white"}`}
-            >
-              <MessageSquare className="w-4 h-4" />
-              Call Transcript ({utterances.length})
-            </button>
+              {/* Glowing Dual horizontal Progress capsule */}
+              <div className="w-full h-3.5 bg-white/[0.06] rounded-full flex overflow-hidden border border-white/5 shadow-inner">
+                <div 
+                  className="h-full bg-gradient-to-r from-purple-600 to-indigo-500 transition-all duration-700 shadow-md relative"
+                  style={{ width: `${agentSpeechPct}%` }}
+                >
+                  {/* Subtle stripes animation overlay */}
+                  <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.05)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.05)_50%,rgba(255,255,255,0.05)_75%,transparent_75%,transparent)] bg-[length:12px_12px] opacity-40"></div>
+                </div>
+                <div 
+                  className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-700 shadow-md relative"
+                  style={{ width: `${customerSpeechPct}%` }}
+                >
+                  <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.05)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.05)_50%,rgba(255,255,255,0.05)_75%,transparent_75%,transparent)] bg-[length:12px_12px] opacity-40"></div>
+                </div>
+              </div>
+
+              <div className="flex justify-between text-[9px] text-gray-500 mt-2 font-bold">
+                <span>Turns: {utterances.filter(u => u.speaker?.toUpperCase().includes("AGENT")).length}</span>
+                <span>Turns: {utterances.filter(u => !u.speaker?.toUpperCase().includes("AGENT")).length}</span>
+              </div>
+            </div>
+
+            {/* Talk Speeds WPM */}
+            <div className="grid grid-cols-2 gap-4 mt-2.5 pt-2 border-t border-white/[0.04]">
+              <div className="text-left">
+                <span className="text-[9px] text-gray-550 block font-bold uppercase tracking-wider">Agent Pace</span>
+                <span className="text-xs font-black text-purple-300">{agentWpm} WPM <span className="text-[9px] font-bold text-gray-500">Avg</span></span>
+              </div>
+              <div className="text-right">
+                <span className="text-[9px] text-gray-550 block font-bold uppercase tracking-wider">Customer Pace</span>
+                <span className="text-xs font-black text-blue-300">{customerWpm} WPM <span className="text-[9px] font-bold text-gray-500">Avg</span></span>
+              </div>
+            </div>
           </div>
+        </div>
 
-          {/* TAB CONTENTS */}
-          <div className="min-h-[250px]">
-            
-            {/* TAB: RULES CHECKLIST */}
-            {activeTab === "checklist" && (
-              <div className="space-y-3.5 animate-fade-in">
-                {ruleResults.length === 0 ? (
-                  <div className="text-center py-10 text-gray-400 italic">No rules results recorded.</div>
-                ) : (
-                  ruleResults.map((rule) => {
-                    const isExpanded = expandedRule === rule.ruleId;
-                    return (
+        {/* Objective & Executive Summary details */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="p-4 rounded-xl bg-white/[0.01] border border-white/5 hover:bg-white/[0.02] hover:border-purple-500/20 transition-all">
+            <h4 className="text-[10px] font-black uppercase text-purple-400 tracking-wider mb-1.5 flex items-center gap-1.5">
+              <Target className="w-3.5 h-3.5" /> Call Objective
+            </h4>
+            <p className="text-gray-300 text-xs leading-relaxed line-clamp-3 font-medium">
+              {audit.objective || "No explicit objective extracted."}
+            </p>
+          </div>
+          <div className="p-4 rounded-xl bg-white/[0.01] border border-white/5 hover:bg-white/[0.02] hover:border-pink-500/20 transition-all">
+            <h4 className="text-[10px] font-black uppercase text-pink-400 tracking-wider mb-1.5 flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5" /> Executive Summary
+            </h4>
+            <p className="text-gray-300 text-xs leading-relaxed line-clamp-3 font-medium">
+              {audit.conclusion || "No conclusion provided."}
+            </p>
+          </div>
+        </div>
+
+        {/* TAB SYSTEM NAVIGATION */}
+        <div className="flex border-b border-white/10 mb-5 overflow-x-auto gap-2 scrollbar-none select-none">
+          <button
+            onClick={() => setActiveTab("checklist")}
+            className={`pb-2.5 px-3 text-xs font-bold tracking-wider uppercase border-b-2 transition-all shrink-0 flex items-center gap-1.5
+              ${activeTab === "checklist"
+                ? "border-purple-500 text-purple-400 font-extrabold"
+                : "border-transparent text-gray-400 hover:text-white"}`}
+          >
+            <ClipboardList className="w-4 h-4" />
+            Rules ({passedCount}/{totalRules})
+          </button>
+          
+          <button
+            onClick={() => setActiveTab("risks")}
+            className={`pb-2.5 px-3 text-xs font-bold tracking-wider uppercase border-b-2 transition-all shrink-0 flex items-center gap-1.5
+              ${activeTab === "risks"
+                ? "border-purple-500 text-purple-400 font-extrabold"
+                : "border-transparent text-gray-400 hover:text-white"}`}
+          >
+            <AlertTriangle className="w-4 h-4" />
+            Compliance Risks ({risks.length})
+          </button>
+
+          <button
+            onClick={() => setActiveTab("coaching")}
+            className={`pb-2.5 px-3 text-xs font-bold tracking-wider uppercase border-b-2 transition-all shrink-0 flex items-center gap-1.5
+              ${activeTab === "coaching"
+                ? "border-purple-500 text-purple-400 font-extrabold"
+                : "border-transparent text-gray-400 hover:text-white"}`}
+          >
+            <Sparkles className="w-4 h-4" />
+            Representative Coaching ({coachingFeedback.length})
+          </button>
+
+          <button
+            onClick={() => setActiveTab("transcript")}
+            className={`pb-2.5 px-3 text-xs font-bold tracking-wider uppercase border-b-2 transition-all shrink-0 flex items-center gap-1.5
+              ${activeTab === "transcript"
+                ? "border-purple-500 text-purple-400 font-extrabold"
+                : "border-transparent text-gray-400 hover:text-white"}`}
+          >
+            <MessageSquare className="w-4 h-4" />
+            Interactive Timeline ({utterances.length})
+          </button>
+        </div>
+
+        {/* TAB CONTENTS */}
+        <div className="min-h-[280px]">
+          
+          {/* TAB: RULES CHECKLIST */}
+          {activeTab === "checklist" && (
+            <div className="space-y-3.5 animate-fade-in">
+              {/* Rules Search and quick filters */}
+              <div className="flex flex-col sm:flex-row gap-3 items-center justify-between mb-4">
+                <div className="relative w-full sm:max-w-xs">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
+                  <input
+                    type="text"
+                    placeholder="Search audit rules..."
+                    value={ruleSearch}
+                    onChange={(e) => setRuleSearch(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 rounded-xl bg-white/[0.02] border border-white/5 text-xs focus:outline-none focus:border-purple-500/50"
+                  />
+                </div>
+
+                <div className="flex gap-1 bg-white/[0.01] border border-white/5 rounded-lg p-0.5 text-[10px] font-bold">
+                  {["ALL", "PASSED", "FAILED"].map((status) => (
+                    <button
+                      key={status}
+                      onClick={() => setRuleFilter(status)}
+                      className={`px-3 py-1 rounded transition-all
+                        ${ruleFilter === status 
+                          ? "bg-purple-500/20 text-purple-300 border border-purple-500/30" 
+                          : "text-gray-400 hover:text-white"}`}
+                    >
+                      {status === "ALL" ? "All" : status === "PASSED" ? "Passed" : "Failed"}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {filteredRuleResults.length === 0 ? (
+                <div className="text-center py-12 text-gray-550 border border-dashed border-white/5 rounded-xl bg-white/[0.01]">
+                  No rules match your filters.
+                </div>
+              ) : (
+                filteredRuleResults.map((rule) => {
+                  const isExpanded = expandedRule === rule.ruleId;
+                  
+                  // Dynamic classification by weight
+                  const weight = rule.weight ?? 10;
+                  let classificationLabel = "Standard Criteria";
+                  let classBadgeClass = "bg-purple-500/10 text-purple-300 border-purple-500/20";
+                  
+                  if (weight >= 20) {
+                    classificationLabel = "CRITICAL COMPLIANCE";
+                    classBadgeClass = "bg-red-500/10 text-red-300 border-red-500/20 animate-pulse";
+                  } else if (weight < 10) {
+                    classificationLabel = "Supporting Guideline";
+                    classBadgeClass = "bg-blue-500/10 text-blue-300 border-blue-500/20";
+                  }
+
+                  return (
+                    <div 
+                      key={rule.ruleId} 
+                      className={`rounded-xl border transition-all duration-300 overflow-hidden
+                        ${rule.passed 
+                          ? "bg-green-500/[0.005] border-green-500/10 hover:border-green-500/25" 
+                          : "bg-red-500/[0.005] border-red-500/10 hover:border-red-500/25"}`}
+                    >
+                      {/* Rule Item Header */}
                       <div 
-                        key={rule.ruleId} 
-                        className={`rounded-xl border transition-all duration-300 overflow-hidden
-                          ${rule.passed 
-                            ? "bg-green-500/[0.01] border-green-500/10 hover:border-green-500/20" 
-                            : "bg-red-500/[0.01] border-red-500/10 hover:border-red-500/20"}`}
+                        onClick={() => toggleRule(rule.ruleId)}
+                        className="p-4 flex items-center justify-between gap-4 cursor-pointer select-none"
                       >
-                        {/* Header bar of the rule */}
-                        <div 
-                          onClick={() => toggleRule(rule.ruleId)}
-                          className="p-4 flex items-center justify-between gap-4 cursor-pointer select-none"
-                        >
-                          <div className="flex items-center gap-3">
-                            {rule.passed ? (
-                              <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0 shadow-lg shadow-green-400/20" />
-                            ) : (
-                              <XCircle className="w-5 h-5 text-red-400 shrink-0 shadow-lg shadow-red-400/20" />
-                            )}
-                            <div>
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="font-extrabold text-sm text-white capitalize">{rule.ruleId}</span>
-                                <span className="text-[9px] uppercase tracking-wider font-extrabold bg-white/5 text-gray-400 px-1.5 py-0.5 rounded">
-                                  Weight: {rule.weight ?? 10}
-                                </span>
-                              </div>
-                              <p className="text-xs text-gray-400 mt-0.5 line-clamp-1 sm:line-clamp-none">
-                                {rule.description || `Evaluation criteria for ${rule.ruleId}.`}
-                              </p>
+                        <div className="flex items-center gap-3">
+                          {rule.passed ? (
+                            <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0 shadow-lg shadow-green-400/10" />
+                          ) : (
+                            <XCircle className="w-5 h-5 text-red-400 shrink-0 shadow-lg shadow-red-400/10" />
+                          )}
+                          <div>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-extrabold text-xs text-white uppercase tracking-wider">{rule.ruleId}</span>
+                              <span className={`text-[8px] uppercase tracking-widest font-black px-1.5 py-0.5 rounded border ${classBadgeClass}`}>
+                                {classificationLabel} (W: {weight})
+                              </span>
                             </div>
-                          </div>
-
-                          <div className="flex items-center gap-3">
-                            <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border hidden sm:inline-block
-                              ${rule.passed 
-                                ? "bg-green-500/10 border-green-500/20 text-green-300" 
-                                : "bg-red-500/10 border-red-500/20 text-red-300"}`}
-                            >
-                              {rule.passed ? "Passed" : "Failed"}
-                            </span>
-                            {isExpanded ? (
-                              <ChevronUp className="w-4 h-4 text-gray-400" />
-                            ) : (
-                              <ChevronDown className="w-4 h-4 text-gray-400" />
-                            )}
+                            <p className="text-[11px] text-gray-400 mt-1 font-medium line-clamp-1 sm:line-clamp-none">
+                              {rule.description || `Criteria mapping for ${rule.ruleId}.`}
+                            </p>
                           </div>
                         </div>
 
-                        {/* Expandable Quote/Evidence details */}
-                        {isExpanded && (
-                          <div className="px-4 pb-4 pt-1 border-t border-white/[0.04] bg-white/[0.01] animate-fade-in">
-                            <div className="text-xs text-purple-300 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                              <Info className="w-3.5 h-3.5" /> Supporting Evidence & Analysis
-                            </div>
-                            <div className="p-3.5 rounded-lg bg-[#0b0f19]/80 border border-white/5 text-xs text-gray-200 leading-relaxed italic relative">
-                              <span className="text-purple-500 text-3xl font-serif absolute -top-2 left-1.5 select-none pointer-events-none opacity-40">“</span>
-                              <p className="pl-5 pr-2">
-                                {rule.evidence || "No transcript quotes or explicit evidence cited by the auditing model."}
-                              </p>
-                            </div>
-                          </div>
-                        )}
+                        <div className="flex items-center gap-3">
+                          <span className={`text-[9px] uppercase font-black px-2 py-0.5 rounded-full border hidden sm:inline-block
+                            ${rule.passed 
+                              ? "bg-green-500/10 border-green-500/25 text-green-300" 
+                              : "bg-red-500/10 border-red-500/25 text-red-300"}`}
+                          >
+                            {rule.passed ? "Passed" : "Failed"}
+                          </span>
+                          {isExpanded ? (
+                            <ChevronUp className="w-4 h-4 text-gray-500" />
+                          ) : (
+                            <ChevronDown className="w-4 h-4 text-gray-500" />
+                          )}
+                        </div>
                       </div>
-                    );
-                  })
-                )}
-              </div>
-            )}
 
-            {/* TAB: COMPLIANCE RISKS */}
-            {activeTab === "risks" && (
-              <div className="space-y-4 animate-fade-in">
-                {risks.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-center border border-dashed border-white/5 rounded-xl bg-white/[0.01]">
-                    <CheckCircle2 className="w-10 h-10 text-green-400 mb-2" />
-                    <span className="text-sm font-bold text-white">No Compliance Risks Detected</span>
-                    <p className="text-xs text-gray-500 mt-1 max-w-sm">This call is fully compliant. No specific regulatory, technical, or customer risks were flagged.</p>
-                  </div>
-                ) : (
-                  risks.map((risk, index) => (
+                      {/* Evidence details */}
+                      {isExpanded && (
+                        <div className="px-4 pb-4 pt-1 border-t border-white/[0.04] bg-[#070c18]/40 animate-fade-in">
+                          <div className="text-[10px] text-purple-400 font-black uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                            <Info className="w-3.5 h-3.5" /> Extracted Conversational Evidence
+                          </div>
+                          <div className="p-3.5 rounded-xl bg-black/40 border border-white/5 text-[11px] text-slate-300 leading-relaxed italic relative">
+                            <span className="text-purple-500 text-3xl font-serif absolute -top-2 left-1.5 select-none pointer-events-none opacity-30">“</span>
+                            <p className="pl-5 pr-2 whitespace-pre-wrap font-medium">
+                              {rule.evidence || "No transcript quotes or explicit evidence found in this call."}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
+
+          {/* TAB: COMPLIANCE RISKS */}
+          {activeTab === "risks" && (
+            <div className="space-y-4 animate-fade-in">
+              
+              {/* Risks Filter row */}
+              <div className="flex flex-col sm:flex-row gap-3 items-center justify-between mb-3">
+                <div className="relative w-full sm:max-w-xs">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
+                  <input
+                    type="text"
+                    placeholder="Search detected risks..."
+                    value={riskSearch}
+                    onChange={(e) => setRiskSearch(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 rounded-xl bg-white/[0.02] border border-white/5 text-xs focus:outline-none focus:border-purple-500/50"
+                  />
+                </div>
+
+                <div className="flex gap-1 bg-white/[0.01] border border-white/5 rounded-lg p-0.5 text-[10px] font-bold">
+                  {["ALL", "HIGH", "MEDIUM", "LOW"].map((sev) => (
+                    <button
+                      key={sev}
+                      onClick={() => setRiskSeverityFilter(sev)}
+                      className={`px-3 py-1 rounded transition-all
+                        ${riskSeverityFilter === sev 
+                          ? "bg-purple-500/20 text-purple-300 border border-purple-500/30" 
+                          : "text-gray-400 hover:text-white"}`}
+                    >
+                      {sev === "ALL" ? "All Severities" : sev.toLowerCase()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {filteredRisks.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-center border border-dashed border-white/5 rounded-xl bg-white/[0.01]">
+                  <CheckCircle2 className="w-12 h-12 text-green-400 mb-2 animate-bounce" style={{ animationDuration: "4s" }} />
+                  <span className="text-sm font-bold text-white">Full Regulatory Clearance</span>
+                  <p className="text-xs text-gray-500 mt-1 max-w-sm">No regulatory, compliance, or customer service risks were detected in this audit.</p>
+                </div>
+              ) : (
+                filteredRisks.map((risk, index) => {
+                  const severity = risk.severity?.toUpperCase() || "LOW";
+                  
+                  let borderLeftClass = "border-l-blue-500";
+                  let severityBadgeColor = "bg-blue-500/10 text-blue-300 border-blue-500/20";
+                  let riskIconColor = "text-blue-400";
+                  
+                  if (severity === "HIGH") {
+                    borderLeftClass = "border-l-red-500";
+                    severityBadgeColor = "bg-red-500/10 text-red-300 border-red-500/20";
+                    riskIconColor = "text-red-400";
+                  } else if (severity === "MEDIUM") {
+                    borderLeftClass = "border-l-amber-500";
+                    severityBadgeColor = "bg-amber-500/10 text-amber-300 border-amber-500/20";
+                    riskIconColor = "text-amber-400";
+                  }
+
+                  return (
                     <div 
                       key={index}
-                      className={`p-4 rounded-xl border border-l-4 flex gap-3.5 transition-all
-                        ${risk.severity?.toLowerCase() === "high"
-                          ? "bg-red-500/[0.02] border-white/5 border-l-red-500"
-                          : risk.severity?.toLowerCase() === "medium"
-                            ? "bg-amber-500/[0.02] border-white/5 border-l-amber-500"
-                            : "bg-blue-500/[0.02] border-white/5 border-l-blue-500"}`}
+                      className={`p-4 rounded-xl border border-white/5 border-l-4 ${borderLeftClass} flex gap-4 transition-all bg-white/[0.005] hover:bg-white/[0.02]`}
                     >
-                      <AlertTriangle className={`w-5 h-5 shrink-0 mt-0.5
-                        ${risk.severity?.toLowerCase() === "high"
-                          ? "text-red-400"
-                          : risk.severity?.toLowerCase() === "medium"
-                            ? "text-amber-400"
-                            : "text-blue-400"}`} 
-                      />
+                      <AlertTriangle className={`w-5 h-5 shrink-0 mt-0.5 ${riskIconColor}`} />
                       
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className={`text-[9px] uppercase tracking-widest font-black px-2 py-0.5 rounded border ${getSeverityClass(risk.severity)}`}>
-                            {risk.severity || "LOW"} Risk
-                          </span>
-                          <span className="text-[10px] text-gray-400 flex items-center gap-1 font-bold">
-                            <Clock className="w-3 h-3 text-purple-400" />
-                            Timestamp: {risk.timestamp || "0:00"}
-                          </span>
+                      <div className="flex-1 flex flex-col justify-between sm:flex-row sm:items-start gap-3">
+                        <div>
+                          <div className="flex items-center gap-2 flex-wrap mb-2">
+                            <span className={`text-[8px] uppercase tracking-widest font-black px-2 py-0.5 rounded border ${severityBadgeColor}`}>
+                              {severity} SEVERITY
+                            </span>
+                            <span className="text-[10px] text-gray-400 flex items-center gap-1 font-bold bg-white/[0.02] px-2 py-0.5 rounded border border-white/5">
+                              <Clock className="w-3 h-3 text-purple-400" />
+                              Timestamp: {risk.timestamp || "0:00"}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-200 leading-relaxed font-medium">
+                            {risk.reason || "Detail not specified."}
+                          </p>
                         </div>
-                        <p className="text-xs md:text-sm text-gray-200 mt-2 leading-relaxed">
-                          {risk.reason || "Detail not specified."}
-                        </p>
+
+                        {/* Interactive Jump Trigger */}
+                        <button
+                          onClick={() => handleJumpToTranscript(risk.timestamp)}
+                          className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-[10px] font-black text-purple-300 hover:bg-purple-500/20 transition-all self-start"
+                        >
+                          Focus Speech <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
-                  ))
-                )}
-              </div>
-            )}
+                  )
+                })
+              )}
+            </div>
+          )}
 
-            {/* TAB: COACHING FEEDBACK */}
-            {activeTab === "coaching" && (
-              <div className="space-y-4 animate-fade-in">
-                <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/10 flex items-center gap-3.5 mb-2">
-                  <Award className="w-8 h-8 text-purple-400 shrink-0" />
-                  <div>
-                    <h4 className="text-sm font-bold text-white">Representative Training & Alignment</h4>
-                    <p className="text-xs text-gray-400 mt-0.5">Use the following micro-coaching advice to align agent performance with company standards.</p>
-                  </div>
+          {/* TAB: COACHING FEEDBACK */}
+          {activeTab === "coaching" && (
+            <div className="space-y-4 animate-fade-in">
+              <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/10 flex items-center gap-3.5 shadow-md">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
+                  <Award className="w-5 h-5 animate-pulse" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-white uppercase tracking-wider">Representative Alignment Plan</h4>
+                  <p className="text-[11px] text-gray-450 mt-0.5">Custom action items extracted by Google Gemini to elevate call quality scores.</p>
+                </div>
+              </div>
+
+              {coachingFeedback.length === 0 ? (
+                <div className="text-center py-12 text-gray-500 italic">No specific coaching points extracted.</div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {coachingFeedback.map((point, idx) => (
+                    <div 
+                      key={idx} 
+                      className="p-4 rounded-xl bg-white/[0.005] border border-white/5 flex gap-3 hover:border-purple-500/20 hover:bg-white/[0.015] transition-all"
+                    >
+                      <span className="w-6 h-6 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-xs font-black text-purple-300 shrink-0">{idx + 1}</span>
+                      <p className="text-gray-300 text-xs leading-relaxed font-medium">
+                        {point}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB: FULL TRANSCRIPT TIMELINE */}
+          {activeTab === "transcript" && (
+            <div className="space-y-4 animate-fade-in">
+              
+              {/* Timeline search filter controls */}
+              <div className="flex flex-col sm:flex-row gap-3 items-center justify-between mb-4 p-1 bg-white/[0.005] border border-white/5 rounded-xl">
+                <div className="relative w-full sm:max-w-xs pl-1">
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
+                  <input
+                    type="text"
+                    placeholder="Search dialogue words..."
+                    value={transcriptSearchTerm}
+                    onChange={(e) => setTranscriptSearchTerm(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 bg-transparent text-xs text-white placeholder-gray-500 focus:outline-none"
+                  />
                 </div>
 
-                {coachingFeedback.length === 0 ? (
-                  <div className="text-center py-10 text-gray-400 italic">No micro-coaching points suggested.</div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {coachingFeedback.map((point, idx) => (
-                      <div key={idx} className="glass-card p-4 rounded-xl border border-white/5 flex gap-3 hover:border-purple-500/20 transition-all">
-                        <span className="w-6 h-6 rounded-lg bg-purple-500/15 flex items-center justify-center text-xs font-black text-purple-400 shrink-0">{idx + 1}</span>
-                        <p className="text-gray-200 text-xs md:text-sm leading-relaxed font-medium">
-                          {point}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <div className="flex gap-1 text-[10px] font-bold pr-1">
+                  {["ALL", "AGENT", "CUSTOMER"].map((spk) => (
+                    <button
+                      key={spk}
+                      onClick={() => setTranscriptSpeakerFilter(spk)}
+                      className={`px-3.5 py-1.5 rounded-lg transition-all
+                        ${transcriptSpeakerFilter === spk 
+                          ? "bg-purple-500/20 text-purple-300 border border-purple-500/30" 
+                          : "text-gray-400 hover:text-white"}`}
+                    >
+                      {spk === "ALL" ? "All Speakers" : spk === "AGENT" ? "Agent Only" : "Customer Only"}
+                    </button>
+                  ))}
+                </div>
               </div>
-            )}
 
-            {/* TAB: FULL TRANSCRIPT TIMELINE */}
-            {activeTab === "transcript" && (
-              <div className="space-y-4 max-h-[450px] overflow-y-auto pr-2 animate-fade-in">
-                {utterances.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-12 text-center border border-dashed border-white/5 rounded-xl bg-white/[0.01]">
-                    <MessageSquare className="w-10 h-10 text-purple-400 mb-2 animate-pulse" />
-                    <span className="text-sm font-bold text-white">Transcript Unavailable</span>
-                    <p className="text-xs text-gray-500 mt-1 max-w-sm">No audio utterances were parsed. Check that AssemblyAI is set up correctly.</p>
+              {/* Scrollable Timeline */}
+              <div className="space-y-4 max-h-[480px] overflow-y-auto pr-2 scrollbar-thin scroll-smooth pb-6">
+                {filteredUtterances.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 text-center border border-dashed border-white/5 rounded-xl bg-white/[0.01]">
+                    <MessageSquare className="w-12 h-12 text-purple-500/30 mb-2" />
+                    <span className="text-sm font-bold text-white">Dialogue Speech Matches Not Found</span>
+                    <p className="text-xs text-gray-500 mt-1 max-w-sm">No speech bubbles fit your query parameters.</p>
                   </div>
                 ) : (
-                  utterances.map((utt, index) => {
+                  filteredUtterances.map((utt, index) => {
                     const isAgent = utt.speaker?.toUpperCase().includes("AGENT") || utt.speaker?.toUpperCase().includes("A");
+                    const originalIndex = utterances.findIndex(u => u.start === utt.start && u.text === utt.text);
+                    const isHighlighted = highlightedUtteranceIndex === originalIndex;
+
+                    const wordsCount = utt.text ? utt.text.trim().split(/\s+/).length : 0;
+                    const durationSec = (utt.end ?? 0) - (utt.start ?? 0);
+
                     return (
                       <div 
-                        key={index}
-                        className={`flex gap-3 max-w-[85%]
-                          ${isAgent ? "mr-auto flex-row" : "ml-auto flex-row-reverse"}`}
+                        key={originalIndex}
+                        id={`utterance-bubble-${originalIndex}`}
+                        className={`flex gap-3 max-w-[85%] transition-all duration-500 rounded-2xl relative
+                          ${isAgent ? "mr-auto flex-row" : "ml-auto flex-row-reverse"}
+                          ${isHighlighted 
+                            ? "ring-2 ring-purple-500/70 bg-purple-500/[0.03] scale-[1.01] p-2 -m-2 shadow-lg shadow-purple-500/10 rounded-2xl animate-pulse" 
+                            : ""}`}
                       >
-                        <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-bold shadow-md
+                        {/* Avatar */}
+                        <div className={`w-8 h-8 rounded-xl shrink-0 flex items-center justify-center text-xs font-black shadow-md border
                           ${isAgent 
-                            ? "bg-purple-500/20 text-purple-300 border border-purple-500/30" 
-                            : "bg-blue-500/20 text-blue-300 border border-blue-500/30"}`}
+                            ? "bg-purple-500/15 text-purple-300 border-purple-500/25 shadow-purple-500/5" 
+                            : "bg-blue-500/15 text-blue-300 border-blue-500/25 shadow-blue-500/5"}`}
                         >
                           {isAgent ? "AG" : "CU"}
                         </div>
 
-                        <div className="flex flex-col gap-1">
-                          <div className={`flex items-center gap-2 text-[10px] font-bold text-gray-500
+                        {/* Dialogue bubble details */}
+                        <div className="flex flex-col gap-1 w-full">
+                          <div className={`flex items-center gap-2 text-[9px] font-black text-gray-550
                             ${isAgent ? "flex-row" : "flex-row-reverse"}`}
                           >
-                            <span className="text-gray-300 uppercase tracking-wider">{isAgent ? "AGENT" : "CUSTOMER"}</span>
+                            <span className={`uppercase tracking-widest ${isAgent ? "text-purple-300" : "text-blue-300"}`}>
+                              {isAgent ? "AGENT" : "CUSTOMER"}
+                            </span>
                             <span>•</span>
-                            <span className="flex items-center gap-0.5">
-                              <Clock className="w-2.5 h-2.5" />
+                            <span className="flex items-center gap-0.5 bg-white/[0.02] border border-white/5 px-1.5 py-0.5 rounded font-mono">
+                              <Clock className="w-2.5 h-2.5 text-purple-400" />
                               {formatTime(utt.start)} - {formatTime(utt.end)}
+                            </span>
+                            <span>•</span>
+                            <span className="font-mono text-gray-500">
+                              {wordsCount} words ({durationSec.toFixed(1)}s)
                             </span>
                           </div>
 
-                          <div className={`p-3.5 rounded-2xl text-xs md:text-sm leading-relaxed border shadow-sm
+                          <div className={`p-3.5 rounded-2xl text-[12px] md:text-sm leading-relaxed border shadow-md font-medium relative group/bubble
                             ${isAgent 
-                              ? "bg-purple-500/5 border-purple-500/10 rounded-tl-none text-purple-50" 
-                              : "bg-white/[0.02] border-white/5 rounded-tr-none text-blue-50"}`}
+                              ? "bg-[#0b0c16]/90 border-purple-500/10 rounded-tl-none text-purple-50/95" 
+                              : "bg-[#090b14]/90 border-blue-500/10 rounded-tr-none text-blue-50/95"}`}
                           >
-                            {utt.text}
+                            {getHighlightedText(utt.text, transcriptSearchTerm)}
+
+                            {/* Mini hover performance cue */}
+                            <div className="absolute right-2.5 bottom-1 opacity-0 group-hover/bubble:opacity-100 transition-opacity pointer-events-none text-[8px] font-bold text-gray-500">
+                              Pace: {Math.round(wordsCount / (durationSec / 60) || 0)} WPM
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -435,11 +761,11 @@ export default function ResultCard({ audit }) {
                   })
                 )}
               </div>
-            )}
-
-          </div>
+            </div>
+          )}
 
         </div>
+
       </div>
     </div>
   );
