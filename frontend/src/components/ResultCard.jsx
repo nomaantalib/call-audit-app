@@ -1307,37 +1307,53 @@ export default function ResultCard({
                       return (
                         <div 
                           key={rule.id}
-                          className={`p-4 rounded-xl border transition-all duration-300 flex items-start gap-4 ${
+                          className={`p-5 rounded-2xl border transition-all duration-300 flex flex-col gap-3 backdrop-blur-md shadow-inner ${
                             ruleState.passed 
-                              ? "bg-emerald-500/[0.005] border-emerald-500/10 hover:border-emerald-500/25" 
-                              : "bg-rose-500/[0.005] border-rose-500/10 hover:border-rose-500/25"
+                              ? "bg-emerald-500/[0.02] border-emerald-500/15 hover:border-emerald-500/30 hover:bg-emerald-500/[0.04]" 
+                              : "bg-white/[0.02] border-white/10 hover:border-purple-500/30 hover:bg-white/[0.04]"
                           }`}
                         >
-                          <input
-                            type="checkbox"
-                            checked={ruleState.passed}
-                            onChange={() => handleToggleLocalRule(rule.id)}
-                            className="w-5 h-5 rounded border-white/10 bg-white/5 text-purple-600 focus:ring-purple-500 focus:ring-2 mt-0.5 cursor-pointer accent-purple-500 shrink-0"
-                          />
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="font-extrabold text-xs text-white uppercase tracking-wider">{rule.id}</span>
-                              <span className="text-[9px] uppercase tracking-widest font-black px-1.5 py-0.5 rounded border border-purple-500/20 bg-purple-500/10 text-purple-300">
-                                Weight: {rule.weight}
-                              </span>
-                              <span className={`text-[8px] uppercase tracking-widest font-black px-1.5 py-0.5 rounded border ${rule.severity === "HIGH" ? "bg-rose-500/10 border-rose-500/20 text-rose-300" : "bg-blue-500/10 border-blue-500/20 text-blue-300"}`}>
-                                Severity: {rule.severity}
-                              </span>
+                          <div className="flex items-start gap-4 w-full">
+                            <div className="shrink-0 mt-0.5">
+                              <input
+                                type="checkbox"
+                                checked={ruleState.passed}
+                                onChange={() => handleToggleLocalRule(rule.id)}
+                                className="w-5 h-5 rounded-md border-white/20 bg-black/40 text-purple-500 focus:ring-purple-500/50 focus:ring-2 focus:ring-offset-0 cursor-pointer accent-purple-500 transition-all shadow-inner"
+                              />
                             </div>
-                            <p className="text-[11px] text-gray-400 mt-1 font-medium">{rule.description}</p>
                             
-                            <input
-                              type="text"
-                              placeholder="Add audit justification or transcript citations..."
-                              value={ruleState.evidence}
-                              onChange={(e) => handleEvidenceChange(rule.id, e.target.value)}
-                              className="w-full mt-2.5 px-3 py-1.5 rounded-lg bg-black/40 border border-white/5 text-xs text-slate-300 focus:outline-none focus:border-purple-500/50 transition-all font-mono"
-                            />
+                            <div className="flex-1 min-w-0 flex flex-col gap-1.5">
+                              <div className="flex flex-wrap items-center justify-between gap-2">
+                                <div className="flex items-center gap-2.5 flex-wrap">
+                                  <h5 className="font-black text-sm text-white uppercase tracking-wider">{rule.id}</h5>
+                                  <span className="text-[9px] uppercase tracking-widest font-black px-2 py-0.5 rounded-md border border-purple-500/20 bg-purple-500/10 text-purple-300 shadow-sm">
+                                    Weight: {rule.weight}
+                                  </span>
+                                  <span className={`text-[8px] uppercase tracking-widest font-black px-2 py-0.5 rounded-md border shadow-sm ${rule.severity === "HIGH" ? "bg-rose-500/10 border-rose-500/20 text-rose-300" : "bg-blue-500/10 border-blue-500/20 text-blue-300"}`}>
+                                    Severity: {rule.severity}
+                                  </span>
+                                </div>
+                                <span className={`text-[10px] font-black uppercase tracking-widest ${ruleState.passed ? "text-emerald-400" : "text-gray-500"}`}>
+                                  {ruleState.passed ? "Passed" : "Pending"}
+                                </span>
+                              </div>
+                              
+                              <p className="text-xs text-gray-400 font-medium leading-relaxed mb-1 pr-4">{rule.description}</p>
+                              
+                              <div className="relative mt-1">
+                                <div className="absolute top-2.5 left-3">
+                                  <MessageSquare className="w-3.5 h-3.5 text-gray-500" />
+                                </div>
+                                <input
+                                  type="text"
+                                  placeholder="Add audit justification or transcript citations..."
+                                  value={ruleState.evidence}
+                                  onChange={(e) => handleEvidenceChange(rule.id, e.target.value)}
+                                  className="w-full pl-9 pr-4 py-2 rounded-xl bg-black/40 border border-white/10 text-xs text-slate-300 focus:outline-none focus:border-purple-500/50 transition-all font-mono shadow-inner placeholder-gray-600"
+                                />
+                              </div>
+                            </div>
                           </div>
                         </div>
                       );
@@ -1407,47 +1423,51 @@ export default function ResultCard({
                       return (
                         <div 
                           key={rule.ruleId} 
-                          className={`rounded-xl border transition-all duration-300 overflow-hidden backdrop-blur-sm
+                          className={`rounded-2xl border transition-all duration-300 overflow-hidden backdrop-blur-md shadow-inner mb-3
                             ${rule.passed 
-                              ? "bg-emerald-500/[0.005] border-emerald-500/10 hover:border-emerald-500/25 hover:shadow-[0_0_20px_rgba(16,185,129,0.06)]" 
-                              : "bg-rose-500/[0.005] border-rose-500/10 hover:border-rose-500/25 hover:shadow-[0_0_20px_rgba(244,63,94,0.06)]"}`}
+                              ? "bg-emerald-500/[0.02] border-emerald-500/15 hover:border-emerald-500/30 hover:shadow-[0_4px_24px_rgba(16,185,129,0.08)]" 
+                              : "bg-rose-500/[0.02] border-rose-500/15 hover:border-rose-500/30 hover:shadow-[0_4px_24px_rgba(244,63,94,0.08)]"}`}
                         >
                           <div 
                             onClick={() => toggleRule(rule.ruleId)}
-                            className="p-4 flex items-center justify-between gap-4 cursor-pointer select-none"
+                            className="p-5 flex items-start gap-4 cursor-pointer select-none"
                           >
-                            <div className="flex items-center gap-3">
+                            <div className="shrink-0 mt-0.5">
                               {rule.passed ? (
-                                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 drop-shadow-[0_0_6px_rgba(52,211,153,0.5)]" />
+                                <CheckCircle2 className="w-5 h-5 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
                               ) : (
-                                <XCircle className="w-5 h-5 text-rose-400 shrink-0 drop-shadow-[0_0_6px_rgba(248,113,113,0.5)]" />
+                                <XCircle className="w-5 h-5 text-rose-400 drop-shadow-[0_0_8px_rgba(248,113,113,0.6)]" />
                               )}
-                              <div>
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="font-extrabold text-xs text-white uppercase tracking-wider">{rule.ruleId}</span>
-                                  <span className={`text-[8px] uppercase tracking-widest font-black px-1.5 py-0.5 rounded border ${classBadgeClass}`}>
+                            </div>
+                            
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                                <div className="flex items-center gap-2.5 flex-wrap">
+                                  <h5 className="font-black text-sm text-white uppercase tracking-wider">{rule.ruleId}</h5>
+                                  <span className={`text-[8px] uppercase tracking-widest font-black px-2 py-0.5 rounded-md border shadow-sm ${classBadgeClass}`}>
                                     {classificationLabel} (W: {weight})
                                   </span>
                                 </div>
-                                <p className="text-[11px] text-gray-400 mt-1 font-medium line-clamp-1 sm:line-clamp-none">
-                                  {rule.description || `Criteria mapping for ${rule.ruleId}.`}
-                                </p>
+                                <div className="flex items-center gap-3">
+                                  <span className={`text-[9px] uppercase font-black px-2.5 py-0.5 rounded-md border shadow-sm tracking-widest hidden sm:inline-block
+                                    ${rule.passed 
+                                      ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" 
+                                      : "bg-rose-500/10 border-rose-500/20 text-rose-400"}`}
+                                  >
+                                    {rule.passed ? "Passed" : "Failed"}
+                                  </span>
+                                  <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-white/10 transition-colors">
+                                    {isExpanded ? (
+                                      <ChevronUp className="w-3.5 h-3.5 text-gray-400" />
+                                    ) : (
+                                      <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+                                    )}
+                                  </div>
+                                </div>
                               </div>
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                              <span className={`text-[9px] uppercase font-black px-2 py-0.5 rounded-full border hidden sm:inline-block
-                                ${rule.passed 
-                                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" 
-                                  : "bg-rose-500/10 border-rose-500/20 text-rose-400"}`}
-                              >
-                                {rule.passed ? "Passed" : "Failed"}
-                              </span>
-                              {isExpanded ? (
-                                <ChevronUp className="w-4 h-4 text-gray-500" />
-                              ) : (
-                                <ChevronDown className="w-4 h-4 text-gray-500" />
-                              )}
+                              <p className="text-xs text-gray-400 font-medium leading-relaxed pr-8 line-clamp-1 sm:line-clamp-none">
+                                {rule.description || `Criteria mapping for ${rule.ruleId}.`}
+                              </p>
                             </div>
                           </div>
 
