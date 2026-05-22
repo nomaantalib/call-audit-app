@@ -14,7 +14,7 @@ export default function HeroBanner() {
         boxShadow: "0 4px 16px rgba(139,92,246,0.1)"
       }}>
         <Award style={{ width: 12, height: 12 }} className="animate-pulse-slow" />
-        Gemini Pro Compliance Sandbox
+        Advanced Compliance Sandbox
         <Sparkles style={{ width: 11, height: 11, color: "#ec4899" }} />
       </div>
 

@@ -81,7 +81,7 @@ export default function Header({ setSidebarOpen, audit, user }) {
           textTransform: "uppercase", letterSpacing: "0.08em"
         }}>
           <Zap size={10} />
-          Gemini Pro
+          Advanced
         </div>
 
         {/* User info */}
