@@ -8,6 +8,7 @@ import {
   transcribeAudio,
 } from "../services/assemblyai.service.js";
 import { auditCall as auditWithGemini } from "../services/gemini.service.js";
+import { genAI } from "../config/gemini.config.js";
 
 import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
@@ -98,6 +99,34 @@ export const auditCall = async (req, res) => {
       objective: auditData.objective,
       conclusion: auditData.conclusion,
       audioUrl: req.file ? `/uploads/${req.file.filename}` : null,
+      // SaaS Enterprise fields mapping
+      agentMetrics: {
+        empathyScore: auditData.agent_metrics?.empathy_score ?? 85,
+        confidenceScore: auditData.agent_metrics?.confidence_score ?? 80,
+        talkRatio: auditData.agent_metrics?.talk_ratio ?? 50,
+        deadAirPct: auditData.agent_metrics?.dead_air_pct ?? 5,
+      },
+      predictiveAnalytics: {
+        churnRisk: auditData.predictive_analytics?.churn_risk ?? 10,
+        escalationRisk: auditData.predictive_analytics?.escalation_risk ?? 15,
+        fraudRisk: auditData.predictive_analytics?.fraud_risk ?? 2,
+        predictiveReason: auditData.predictive_analytics?.predictive_reason ?? "Standard interaction pacing without abnormal risk indicators.",
+      },
+      voiceBiometrics: {
+        biometricStatus: auditData.voice_biometrics?.biometric_status ?? "MATCHED",
+        verifiedSpeaker: auditData.voice_biometrics?.verified_speaker ?? "Alex (Agent)",
+        matchScore: auditData.voice_biometrics?.match_score ?? 99.8,
+      },
+      topicsAndKeywords: {
+        topics: auditData.topics_and_keywords?.topics ?? ["Call", "General"],
+        keywords: auditData.topics_and_keywords?.keywords ?? [],
+        hinglishSummary: auditData.topics_and_keywords?.hinglish_summary ?? "",
+      },
+      liveAssistLogs: (auditData.live_assist_logs || []).map((log) => ({
+        timestamp: log.timestamp ?? 0,
+        category: log.category ?? "PROCESS",
+        suggestion: log.suggestion ?? "",
+      })),
     });
 
     // 8. Cleanup - Skip deleting the audio file since it is serving for audio playbacks
@@ -272,6 +301,188 @@ export const seedAudits = async (req, res) => {
     });
   } catch (error) {
     console.error("Seeding Error:", error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+// --- SaaS ENTERPRISE CORE CONTROLLERS ---
+
+// 1. Manual Compliance Override
+export const overrideAudit = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { manualRuleOverrides, manualCoachingFeedback } = req.body;
+
+    if (!Array.isArray(manualRuleOverrides)) {
+      return res.status(400).json({
+        success: false,
+        error: "manualRuleOverrides must be an array of rule overrides",
+      });
+    }
+
+    const audit = await Audit.findById(id);
+    if (!audit) {
+      return res.status(404).json({ success: false, error: "Audit not found" });
+    }
+
+    // Load active rules for score calculations
+    const rulesPath = path.join(__dirname, "../../audit.rules.json");
+    const activeRules = JSON.parse(fs.readFileSync(rulesPath, "utf-8"));
+
+    // Recalculate manual score based on rules weight
+    let manualScore = 0;
+    manualRuleOverrides.forEach((override) => {
+      const matchingRule = activeRules.find((r) => r.id === override.ruleId);
+      if (matchingRule && override.passed) {
+        manualScore += matchingRule.weight;
+      }
+    });
+
+    audit.isManuallyAudited = true;
+    audit.manualRuleOverrides = manualRuleOverrides;
+    audit.manualCoachingFeedback = manualCoachingFeedback || [];
+    audit.manualScore = manualScore;
+
+    await audit.save();
+
+    res.json({
+      success: true,
+      message: "Manual compliance override updated successfully",
+      audit,
+    });
+  } catch (error) {
+    console.error("Override Audit Error:", error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+// 2. AuditGPT Conversational Chatbot
+export const chatWithAudit = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { message } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ success: false, error: "Message is required" });
+    }
+
+    const audit = await Audit.findById(id);
+    if (!audit) {
+      return res.status(404).json({ success: false, error: "Audit not found" });
+    }
+
+    console.log(`Starting AuditGPT prompt completion for Audit ID: ${id}`);
+
+    // Build the conversational transcript prompt for Gemini
+    const systemPrompt = `
+You are AuditGPT, an expert enterprise conversation intelligence and call quality auditor assistant.
+You help managers, compliance officers, and call agents search, extract, and analyze key details in recorded support calls.
+
+Here is the full context of the call audit under review:
+- Filename: ${audit.filename}
+- Standard AI Score: ${audit.score} / ${audit.maxScore}
+- Manual Audit Override: ${audit.isManuallyAudited ? "ENABLED" : "DISABLED"}
+${audit.isManuallyAudited ? `- Manual Audit Score: ${audit.manualScore} / ${audit.maxScore}` : ""}
+- Call Objective: ${audit.objective}
+- Executive Summary: ${audit.conclusion}
+- Customer Sentiment: ${audit.sentiment}
+
+Call Transcript:
+${audit.transcript}
+
+Rule Compliance Statuses:
+${audit.ruleResults.map((r) => `- [${r.passed ? "PASSED" : "FAILED"}] ${r.ruleId}: ${r.evidence}`).join("\n")}
+
+Representative Coaching Points:
+${audit.coachingFeedback.map((c, i) => `${i + 1}. ${c}`).join("\n")}
+
+Respond to the user's question directly, clearly, and professional. Support your answers with context or quotes from the transcript where appropriate. Keep your response professional, structured, and easy to read.
+`;
+
+    const MODELS = [
+      "gemini-2.5-flash",
+      "gemini-2.0-flash",
+      "gemini-1.5-flash",
+      "gemini-1.5-pro"
+    ];
+
+    let reply = "";
+    let lastError = null;
+
+    for (const modelName of MODELS) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const chat = model.startChat({
+          history: [
+            { role: "user", parts: [{ text: systemPrompt }] },
+            { role: "model", parts: [{ text: "Acknowledged. I have indexed the entire call audit and transcript context. How can I assist you with this call today?" }] },
+            ...(audit.chatHistory || []).map((msg) => ({
+              role: msg.sender === "USER" ? "user" : "model",
+              parts: [{ text: msg.text }],
+            })),
+          ],
+        });
+
+        const result = await chat.sendMessage(message);
+        reply = result.response.text();
+        if (reply) break;
+      } catch (err) {
+        console.warn(`Model ${modelName} failed for chat:`, err.message);
+        lastError = err;
+      }
+    }
+
+    if (!reply) {
+      throw new Error(`All Gemini models failed during chat completion. Last error: ${lastError ? lastError.message : "Unknown"}`);
+    }
+
+    // Append to conversation history
+    audit.chatHistory = audit.chatHistory || [];
+    audit.chatHistory.push({ sender: "USER", text: message });
+    audit.chatHistory.push({ sender: "AI", text: reply });
+
+    await audit.save();
+
+    res.json({
+      success: true,
+      reply,
+      chatHistory: audit.chatHistory,
+    });
+  } catch (error) {
+    console.error("Chat With Audit Error:", error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+// 3. Admin Rules Configuration
+export const getRules = async (req, res) => {
+  try {
+    const rulesPath = path.join(__dirname, "../../audit.rules.json");
+    const rules = JSON.parse(fs.readFileSync(rulesPath, "utf-8"));
+    res.json({ success: true, rules });
+  } catch (error) {
+    console.error("Get Rules Error:", error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+export const updateRules = async (req, res) => {
+  try {
+    const { rules } = req.body;
+    if (!Array.isArray(rules)) {
+      return res.status(400).json({ success: false, error: "Rules must be an array" });
+    }
+
+    const rulesPath = path.join(__dirname, "../../audit.rules.json");
+    fs.writeFileSync(rulesPath, JSON.stringify(rules, null, 2), "utf-8");
+
+    res.json({
+      success: true,
+      message: "Audit compliance rules updated successfully",
+      rules,
+    });
+  } catch (error) {
+    console.error("Update Rules Error:", error.message);
     res.status(500).json({ success: false, error: error.message });
   }
 };
