@@ -59,7 +59,7 @@ export default function UploadForm({ onResult, seedSampleData, seeding, hasAudit
     const f = e.target.files?.[0];
     if (!f) return;
     if (f.size > 1 * 1024 * 1024) {
-      setError("File exceeds the 500 KB limit.");
+      setError("File exceeds the 1 MB limit.");
       setFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
