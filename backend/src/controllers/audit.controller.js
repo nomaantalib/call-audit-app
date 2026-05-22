@@ -97,17 +97,11 @@ export const auditCall = async (req, res) => {
       sentiment: auditData.sentiment,
       objective: auditData.objective,
       conclusion: auditData.conclusion,
+      audioUrl: req.file ? `/uploads/${req.file.filename}` : null,
     });
 
-    // 8. Cleanup
-    try {
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-        console.log("Cleanup: Temp file deleted");
-      }
-    } catch (cleanupErr) {
-      console.warn("Cleanup failed", cleanupErr.message);
-    }
+    // 8. Cleanup - Skip deleting the audio file since it is serving for audio playbacks
+    console.log("Cleanup: Audio file preserved at:", filePath);
 
     console.log("Audit complete successfully.");
     res.json({
@@ -185,7 +179,8 @@ export const seedAudits = async (req, res) => {
         maxScore: 100,
         sentiment: "Positive",
         objective: "Billing discrepancy resolution and credit reversal.",
-        conclusion: "Excellent resolution of a double-billing complaint with strong compliance and positive customer tone."
+        conclusion: "Excellent resolution of a double-billing complaint with strong compliance and positive customer tone.",
+        audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
       },
       {
         user: userId,
@@ -223,7 +218,8 @@ export const seedAudits = async (req, res) => {
         maxScore: 100,
         sentiment: "Negative",
         objective: "Billing dispute and contract escalation.",
-        conclusion: "Critical compliance failure. Agent was highly unprofessional, refused escalation, and hung up on customer."
+        conclusion: "Critical compliance failure. Agent was highly unprofessional, refused escalation, and hung up on customer.",
+        audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
       },
       {
         user: userId,
@@ -263,7 +259,8 @@ export const seedAudits = async (req, res) => {
         maxScore: 100,
         sentiment: "Positive",
         objective: "Invoice payment processing.",
-        conclusion: "The agent processed the transaction politely, but committed a high-risk PCI compliance violation by reading the CVV aloud."
+        conclusion: "The agent processed the transaction politely, but committed a high-risk PCI compliance violation by reading the CVV aloud.",
+        audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
       }
     ];
 

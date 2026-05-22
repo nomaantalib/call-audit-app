@@ -27,6 +27,8 @@ export default function App() {
   const [sentimentFilter, setSentimentFilter] = useState("ALL");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [seeding, setSeeding] = useState(false);
+  const [playingAudioUrl, setPlayingAudioUrl] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -129,7 +131,6 @@ export default function App() {
       {/* Mobile backdrop */}
       <div className={`mobile-overlay ${sidebarOpen ? "visible" : ""}`} onClick={() => setSidebarOpen(false)} />
 
-      {/* ── SIDEBAR ── */}
       <Sidebar
         user={user}
         logout={logout}
@@ -147,6 +148,11 @@ export default function App() {
         getSentimentIcon={getSentimentIcon}
         seedSampleData={seedSampleData}
         seeding={seeding}
+        playingAudioUrl={playingAudioUrl}
+        setPlayingAudioUrl={setPlayingAudioUrl}
+        isPlaying={isPlaying}
+        setIsPlaying={setIsPlaying}
+        backendUrl={backendUrl}
       />
 
       {/* ── STAGE (right panel) ── */}
@@ -184,36 +190,85 @@ export default function App() {
               /* Audit selected → show result card */
               <div className="w-full animate-fade-in" style={{ display: "flex", flexDirection: "column", gap: "1rem", width: "100%" }}>
                 {/* Breadcrumb row */}
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
+                <div style={{
+                  display: "flex", 
+                  alignItems: "center", 
+                  justifyContent: "space-between", 
+                  gap: "1rem",
+                  padding: "0.6rem 1rem",
+                  borderRadius: "16px",
+                  background: "rgba(255, 255, 255, 0.01)",
+                  border: "1px solid rgba(255, 255, 255, 0.04)",
+                  backdropFilter: "blur(12px)",
+                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.03)"
+                }}>
                   <button
-                    onClick={() => setAudit(null)}
-                    style={{
-                      display: "flex", alignItems: "center", gap: "0.4rem",
-                      padding: "0.45rem 0.9rem", borderRadius: 12,
-                      fontSize: 11, fontWeight: 900, color: "#a78bfa",
-                      background: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.2)",
-                      cursor: "pointer", transition: "all 0.2s ease", fontFamily: "inherit"
+                    onClick={() => {
+                      setAudit(null);
+                      setIsPlaying(false);
+                      setPlayingAudioUrl(null);
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(139,92,246,0.12)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "rgba(139,92,246,0.06)"; }}
+                    style={{
+                      display: "flex", 
+                      alignItems: "center", 
+                      gap: "0.5rem",
+                      padding: "0.5rem 1rem", 
+                      borderRadius: "12px",
+                      fontSize: "12px", 
+                      fontWeight: 800, 
+                      color: "#a78bfa",
+                      background: "rgba(139, 92, 246, 0.08)", 
+                      border: "1px solid rgba(139, 92, 246, 0.25)",
+                      cursor: "pointer", 
+                      transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)", 
+                      fontFamily: "inherit",
+                      boxShadow: "0 4px 12px rgba(139, 92, 246, 0.05)"
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = "rgba(139, 92, 246, 0.15)";
+                      e.currentTarget.style.borderColor = "rgba(139, 92, 246, 0.4)";
+                      e.currentTarget.style.transform = "translateX(-2px)";
+                      e.currentTarget.style.boxShadow = "0 4px 16px rgba(139, 92, 246, 0.15), 0 0 8px rgba(167, 139, 250, 0.2)";
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = "rgba(139, 92, 246, 0.08)";
+                      e.currentTarget.style.borderColor = "rgba(139, 92, 246, 0.25)";
+                      e.currentTarget.style.transform = "translateX(0)";
+                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(139, 92, 246, 0.05)";
+                    }}
                   >
                     <ArrowLeft style={{ width: 14, height: 14 }} />
                     Back to Uploader
                   </button>
 
                   <span style={{
-                    display: "flex", alignItems: "center", gap: "0.35rem",
-                    fontSize: 9, fontWeight: 900, color: "#475569",
-                    textTransform: "uppercase", letterSpacing: "0.1em",
-                    padding: "0.35rem 0.75rem", borderRadius: 10,
-                    background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)"
+                    display: "flex", 
+                    alignItems: "center", 
+                    gap: "0.4rem",
+                    fontSize: "10px", 
+                    fontWeight: 900, 
+                    color: "#cbd5e1",
+                    textTransform: "uppercase", 
+                    letterSpacing: "0.12em",
+                    padding: "0.4rem 0.85rem", 
+                    borderRadius: "10px",
+                    background: "rgba(139, 92, 246, 0.04)", 
+                    border: "1px solid rgba(139, 92, 246, 0.15)",
+                    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.02)"
                   }}>
-                    <SlidersHorizontal style={{ width: 12, height: 12, color: "#7c3aed" }} />
+                    <SlidersHorizontal style={{ width: 12, height: 12, color: "#a78bfa" }} />
                     Report #{audit._id?.slice(-6).toUpperCase()}
                   </span>
                 </div>
 
-                <ResultCard audit={audit} />
+                <ResultCard 
+                  audit={audit} 
+                  playingAudioUrl={playingAudioUrl}
+                  setPlayingAudioUrl={setPlayingAudioUrl}
+                  isPlaying={isPlaying}
+                  setIsPlaying={setIsPlaying}
+                  backendUrl={backendUrl}
+                />
               </div>
             )}
 

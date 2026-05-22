@@ -42,6 +42,7 @@ const AuditSchema = new mongoose.Schema(
     sentiment: { type: String },
     objective: { type: String },
     conclusion: { type: String },
+    audioUrl: { type: String },
     createdAt: { type: Date, default: Date.now },
   },
   { collection: "audits" }

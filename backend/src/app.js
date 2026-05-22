@@ -47,6 +47,9 @@ app.get("/api/debug-files", (req, res) => {
   }
 });
 
+// Serving uploads directory statically for audio files
+app.use("/uploads", express.static(path.join(__dirname, "../../uploads")));
+
 // Serving Frontend static files
 app.use(express.static(frontendPath));
 

@@ -1,5 +1,5 @@
 import { 
-  Headphones, X, Award, History, Search, Clock, LogOut, Sparkles, ArrowRight
+  Headphones, X, Award, History, Search, Clock, LogOut, Sparkles, ArrowRight, Play, Pause
 } from "lucide-react";
 
 export default function Sidebar({
@@ -9,7 +9,9 @@ export default function Sidebar({
   sentimentFilter, setSentimentFilter,
   sidebarOpen, setSidebarOpen,
   formatDate, getSentimentIcon,
-  seedSampleData, seeding
+  seedSampleData, seeding,
+  playingAudioUrl, setPlayingAudioUrl,
+  isPlaying, setIsPlaying, backendUrl
 }) {
   return (
     <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
@@ -243,6 +245,7 @@ export default function Sidebar({
             filteredHistory.map((item) => {
               const pct = Math.round(((item.score ?? 0) / (item.maxScore || 100)) * 100);
               const isSelected = audit?._id === item._id;
+              const isCurrentItemPlaying = playingAudioUrl === item.audioUrl && isPlaying;
 
               let glowClass = "active-audit-glow-red";
               let scoreColor = "#f87171";
@@ -253,6 +256,19 @@ export default function Sidebar({
               let badgeClass = "sentiment-badge sentiment-badge-neutral";
               if (s.includes("positive")) badgeClass = "sentiment-badge sentiment-badge-positive";
               if (s.includes("negative")) badgeClass = "sentiment-badge sentiment-badge-negative";
+
+              const handlePlaybackToggle = (e) => {
+                e.stopPropagation();
+                if (!item.audioUrl) return;
+                
+                if (audit?._id === item._id) {
+                  setIsPlaying(!isPlaying);
+                } else {
+                  setAudit(item);
+                  setPlayingAudioUrl(item.audioUrl);
+                  setIsPlaying(true);
+                }
+              };
 
               return (
                 <div
@@ -274,12 +290,35 @@ export default function Sidebar({
                 >
                   {/* Filename + sentiment icon */}
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
-                    <span style={{
-                      fontSize: 11, fontWeight: 800, color: "#cbd5e1",
-                      overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1
-                    }}>
-                      {item.filename}
-                    </span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0, flex: 1 }}>
+                      {isCurrentItemPlaying && (
+                        <div style={{ display: "flex", alignItems: "end", gap: "2px", height: "12px", width: "12px", shrink: 0, paddingBottom: "2px" }}>
+                          {[1, 2, 3].map((_, i) => (
+                            <span
+                              key={i}
+                              className="waveform-bar"
+                              style={{
+                                width: "2px",
+                                height: "100%",
+                                background: "#c084fc",
+                                borderRadius: "99px",
+                              }}
+                            />
+                          ))}
+                        </div>
+                      )}
+                      <span style={{
+                        fontSize: 11,
+                        fontWeight: 800,
+                        color: isCurrentItemPlaying ? "#c084fc" : "#cbd5e1",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        flex: 1
+                      }}>
+                        {item.filename}
+                      </span>
+                    </div>
                     {getSentimentIcon(item.sentiment)}
                   </div>
 
@@ -297,10 +336,44 @@ export default function Sidebar({
                   {/* Sentiment badge + duration */}
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span className={badgeClass}>{item.sentiment || "Neutral"}</span>
-                    <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 9, color: "#334155" }}>
-                      <Clock size={9} style={{ color: "#6d28d9" }} />
-                      {item.duration ? `${Math.round(item.duration)}s` : "N/A"}
-                    </span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 9, color: "#334155" }}>
+                        <Clock size={9} style={{ color: "#6d28d9" }} />
+                        {item.duration ? `${Math.round(item.duration)}s` : "N/A"}
+                      </span>
+                      {item.audioUrl && (
+                        <button
+                          onClick={handlePlaybackToggle}
+                          style={{
+                            background: isCurrentItemPlaying ? "rgba(139,92,246,0.2)" : "rgba(255,255,255,0.05)",
+                            border: isCurrentItemPlaying ? "1px solid rgba(139,92,246,0.4)" : "1px solid rgba(255,255,255,0.1)",
+                            borderRadius: "50%",
+                            width: "18px",
+                            height: "18px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            color: isCurrentItemPlaying ? "#c084fc" : "#94a3b8",
+                            transition: "all 0.2s ease"
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = "rgba(139,92,246,0.3)";
+                            e.currentTarget.style.color = "#ffffff";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = isCurrentItemPlaying ? "rgba(139,92,246,0.2)" : "rgba(255,255,255,0.05)";
+                            e.currentTarget.style.color = isCurrentItemPlaying ? "#c084fc" : "#94a3b8";
+                          }}
+                        >
+                          {isCurrentItemPlaying ? (
+                            <Pause size={8} style={{ fill: "currentColor" }} />
+                          ) : (
+                            <Play size={8} style={{ fill: "currentColor", marginLeft: "1px" }} />
+                          )}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
