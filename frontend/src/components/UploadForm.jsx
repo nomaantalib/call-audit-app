@@ -13,6 +13,18 @@ const STAGES = [
   { text: "Extracting objective, conclusion & sentiment…",icon: Database },
   { text: "Generating coaching tips & risk summary…",   icon: Award },
 ];
+const getBackendUrl = () => {
+  if (import.meta.env.VITE_BACKEND_URL) {
+    return import.meta.env.VITE_BACKEND_URL;
+  }
+  const isLocal = typeof window !== "undefined" && 
+    (window.location.hostname === "localhost" || 
+     window.location.hostname === "127.0.0.1" || 
+     window.location.hostname.startsWith("192.168."));
+  return isLocal ? "http://localhost:5000" : "https://call-audit-app-brrj.onrender.com";
+};
+
+const backendUrl = getBackendUrl();
 
 export default function UploadForm({ onResult, seedSampleData, seeding, hasAudits }) {
   const [file, setFile]               = useState(null);
@@ -78,7 +90,6 @@ export default function UploadForm({ onResult, seedSampleData, seeding, hasAudit
     try {
       const form = new FormData();
       form.append("audio", file);
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? "http://localhost:5000" : "");
       const { data } = await axios.post(`${backendUrl}/api/audit`, form);
       if (data.success && data.audit) { onResult(data.audit); setSuccess(true); }
       else throw new Error(data.error || "Analysis failed.");

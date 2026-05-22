@@ -9,6 +9,18 @@ import Header from "./components/Header";
 import HeroBanner from "./components/HeroBanner";
 import { useAuth } from "./context/AuthContext";
 import { Smile, Meh, Frown, ArrowLeft, SlidersHorizontal, Activity } from "lucide-react";
+const getBackendUrl = () => {
+  if (import.meta.env.VITE_BACKEND_URL) {
+    return import.meta.env.VITE_BACKEND_URL;
+  }
+  const isLocal = typeof window !== "undefined" && 
+    (window.location.hostname === "localhost" || 
+     window.location.hostname === "127.0.0.1" || 
+     window.location.hostname.startsWith("192.168."));
+  return isLocal ? "http://localhost:5000" : "https://call-audit-app-brrj.onrender.com";
+};
+
+const backendUrl = getBackendUrl();
 
 export default function App() {
   const { user, loading, logout } = useAuth();
@@ -32,7 +44,6 @@ export default function App() {
   const fetchHistory = async () => {
     setLoadingHistory(true);
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? "http://localhost:5000" : "");
       const { data } = await axios.get(`${backendUrl}/api/audit`);
       if (data.success && data.audits) setHistory(data.audits);
     } catch (err) {
@@ -45,7 +56,6 @@ export default function App() {
   const seedSampleData = async () => {
     setSeeding(true);
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || (import.meta.env.DEV ? "http://localhost:5000" : "");
       const { data } = await axios.post(`${backendUrl}/api/audit/seed`);
       if (data.success && data.audits?.length > 0) {
         await fetchHistory();

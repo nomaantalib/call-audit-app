@@ -3,7 +3,18 @@ import axios from "axios";
 
 const AuthContext = createContext();
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+const getBackendUrl = () => {
+  if (import.meta.env.VITE_BACKEND_URL) {
+    return import.meta.env.VITE_BACKEND_URL;
+  }
+  const isLocal = typeof window !== "undefined" && 
+    (window.location.hostname === "localhost" || 
+     window.location.hostname === "127.0.0.1" || 
+     window.location.hostname.startsWith("192.168."));
+  return isLocal ? "http://localhost:5000" : "https://call-audit-app-brrj.onrender.com";
+};
+
+const backendUrl = getBackendUrl();
 
 // Add a global Axios request interceptor to inject JWT bearer token
 axios.interceptors.request.use(
