@@ -52,13 +52,13 @@ export default function UploadForm({ onResult, seedSampleData, seeding, hasAudit
     const f = e.dataTransfer.files?.[0];
     if (!f) return;
     if (!f.type.startsWith("audio/")) { setError("Please select a valid audio file (MP3, WAV, M4A)."); return; }
-    if (f.size > 500 * 1024) { setError("File exceeds the 500 KB limit."); return; }
+    if (f.size > 1 * 1024 * 1024) { setError("File exceeds the 1 MB limit."); return; }
     setFile(f); setError(null); setSuccess(false);
   };
   const handleFileChange = (e) => {
     const f = e.target.files?.[0];
     if (!f) return;
-    if (f.size > 500 * 1024) {
+    if (f.size > 1 * 1024 * 1024) {
       setError("File exceeds the 500 KB limit.");
       setFile(null);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -181,7 +181,7 @@ export default function UploadForm({ onResult, seedSampleData, seeding, hasAudit
                   {file.name}
                 </span>
                 <span style={{ fontSize: 10, color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.07em" }}>
-                  {(file.size / 1024).toFixed(1)} KB / 500 KB max
+                  {(file.size / 1024).toFixed(1)} KB / 1 MB max
                 </span>
                 <button
                   onClick={removeFile}
@@ -207,7 +207,7 @@ export default function UploadForm({ onResult, seedSampleData, seeding, hasAudit
                     Select call audio or drag &amp; drop
                   </span>
                   <span style={{ fontSize: 11, color: "#475569", fontWeight: 500, lineHeight: 1.5, textAlign: "center" }}>
-                    Supports MP3 · WAV · M4A · up to 500 KB
+                    Supports MP3 · WAV · M4A · up to 1 MB
                   </span>
                 </div>
               </div>
