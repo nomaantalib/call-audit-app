@@ -6,11 +6,10 @@ import { protect } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
-// Public route for uploading audio and auditing
-router.post("/", upload.single("audio"), auditCall);
-
-// Protected routes for retrieving audits and seeding sandbox
+// All audit routes are protected by auth middleware
 router.use(protect);
+
+router.post("/", upload.single("audio"), auditCall);
 router.get("/", getAudits);
 router.post("/seed", seedAudits);
 
