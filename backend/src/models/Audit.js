@@ -9,6 +9,7 @@ const AuditSchema = new mongoose.Schema(
       required: true,
     },
     filename: { type: String, required: true },
+    duration: { type: Number }, // Saved audio duration
     transcript: { type: String }, // Full transcript
     utterances: [
       {

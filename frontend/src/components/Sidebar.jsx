@@ -339,7 +339,10 @@ export default function Sidebar({
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                       <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 9, color: "#334155" }}>
                         <Clock size={9} style={{ color: "#6d28d9" }} />
-                        {item.duration ? `${Math.round(item.duration)}s` : "N/A"}
+                        {(() => {
+                          const dur = item.duration || (item.utterances && item.utterances.length > 0 ? item.utterances[item.utterances.length - 1].end : 0);
+                          return dur ? `${Math.round(dur)}s` : "N/A";
+                        })()}
                       </span>
                       {item.audioUrl && (
                         <button

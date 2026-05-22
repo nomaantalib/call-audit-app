@@ -997,75 +997,93 @@ export default function ResultCard({
         </div>
 
         {/* TAB SYSTEM NAVIGATION */}
-        <div className="flex border-b border-white/10 mb-5 overflow-x-auto gap-2 scrollbar-none select-none">
+        <div className="flex flex-wrap gap-2 p-1.5 rounded-2xl bg-[#060916]/80 border border-white/5 mb-6 backdrop-blur-md">
           <button
             onClick={() => setActiveTab("checklist")}
-            className={`pb-3 px-3 text-xs font-bold tracking-wider uppercase border-b-2 transition-all shrink-0 flex items-center gap-1.5 cursor-pointer
+            className={`px-4 py-2 text-[11px] font-black uppercase tracking-wider rounded-xl transition-all duration-300 flex items-center gap-2 cursor-pointer
               ${activeTab === "checklist"
-                ? "border-purple-500 text-purple-400 font-extrabold"
-                : "border-transparent text-gray-400 hover:text-white"}`}
+                ? "bg-purple-600/20 text-purple-400 border border-purple-500/35 shadow-[0_0_12px_rgba(139,92,246,0.25)]"
+                : "border border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]"}`}
           >
-            <ClipboardList className="w-4 h-4" />
-            Rules ({passedCount}/{totalRules})
+            <ClipboardList className="w-3.5 h-3.5" />
+            <span>Rules</span>
+            <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black ${activeTab === "checklist" ? "bg-purple-500/35 text-purple-200" : "bg-white/5 text-slate-400"}`}>
+              {passedCount}/{totalRules}
+            </span>
           </button>
           
           {mode === "ai" && (
             <button
               onClick={() => setActiveTab("risks")}
-              className={`pb-3 px-3 text-xs font-bold tracking-wider uppercase border-b-2 transition-all shrink-0 flex items-center gap-1.5 cursor-pointer
+              className={`px-4 py-2 text-[11px] font-black uppercase tracking-wider rounded-xl transition-all duration-300 flex items-center gap-2 cursor-pointer
                 ${activeTab === "risks"
-                  ? "border-purple-500 text-purple-400 font-extrabold"
-                  : "border-transparent text-gray-400 hover:text-white"}`}
+                  ? "bg-purple-600/20 text-purple-400 border border-purple-500/35 shadow-[0_0_12px_rgba(139,92,246,0.25)]"
+                  : "border border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]"}`}
             >
-              <AlertTriangle className="w-4 h-4" />
-              Compliance Risks ({risks.length})
+              <AlertTriangle className="w-3.5 h-3.5" />
+              <span>Compliance Risks</span>
+              <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black ${activeTab === "risks" ? "bg-purple-500/35 text-purple-200" : "bg-white/5 text-slate-400"}`}>
+                {risks.length}
+              </span>
             </button>
           )}
 
           <button
             onClick={() => setActiveTab("coaching")}
-            className={`pb-3 px-3 text-xs font-bold tracking-wider uppercase border-b-2 transition-all shrink-0 flex items-center gap-1.5 cursor-pointer
+            className={`px-4 py-2 text-[11px] font-black uppercase tracking-wider rounded-xl transition-all duration-300 flex items-center gap-2 cursor-pointer
               ${activeTab === "coaching"
-                ? "border-purple-500 text-purple-400 font-extrabold"
-                : "border-transparent text-gray-400 hover:text-white"}`}
+                ? "bg-purple-600/20 text-purple-400 border border-purple-500/35 shadow-[0_0_12px_rgba(139,92,246,0.25)]"
+                : "border border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]"}`}
           >
-            <Sparkles className="w-4 h-4" />
-            Representative Coaching ({coachingFeedback.length})
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Coaching</span>
+            <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black ${activeTab === "coaching" ? "bg-purple-500/35 text-purple-200" : "bg-white/5 text-slate-400"}`}>
+              {coachingFeedback.length}
+            </span>
           </button>
 
           <button
             onClick={() => setActiveTab("transcript")}
-            className={`pb-3 px-3 text-xs font-bold tracking-wider uppercase border-b-2 transition-all shrink-0 flex items-center gap-1.5 cursor-pointer
+            className={`px-4 py-2 text-[11px] font-black uppercase tracking-wider rounded-xl transition-all duration-300 flex items-center gap-2 cursor-pointer
               ${activeTab === "transcript"
-                ? "border-purple-500 text-purple-400 font-extrabold"
-                : "border-transparent text-gray-400 hover:text-white"}`}
+                ? "bg-purple-600/20 text-purple-400 border border-purple-500/35 shadow-[0_0_12px_rgba(139,92,246,0.25)]"
+                : "border border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]"}`}
           >
-            <MessageSquare className="w-4 h-4" />
-            Interactive Timeline ({utterances.length})
+            <MessageSquare className="w-3.5 h-3.5" />
+            <span>Timeline</span>
+            <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black ${activeTab === "transcript" ? "bg-purple-500/35 text-purple-200" : "bg-white/5 text-slate-400"}`}>
+              {utterances.length}
+            </span>
           </button>
 
           {mode === "ai" && (
             <>
               <button
                 onClick={() => setActiveTab("assist")}
-                className={`pb-3 px-3 text-xs font-bold tracking-wider uppercase border-b-2 transition-all shrink-0 flex items-center gap-1.5 cursor-pointer
+                className={`px-4 py-2 text-[11px] font-black uppercase tracking-wider rounded-xl transition-all duration-300 flex items-center gap-2 cursor-pointer
                   ${activeTab === "assist"
-                    ? "border-purple-500 text-purple-400 font-extrabold"
-                    : "border-transparent text-gray-400 hover:text-white"}`}
+                    ? "bg-purple-600/20 text-purple-400 border border-purple-500/35 shadow-[0_0_12px_rgba(139,92,246,0.25)]"
+                    : "border border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]"}`}
               >
-                <Zap className="w-4 h-4 text-purple-400" />
-                Agent Assist Logs
+                <Zap className="w-3.5 h-3.5 text-purple-400" />
+                <span>Agent Assist</span>
+                <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black ${activeTab === "assist" ? "bg-purple-500/35 text-purple-200" : "bg-white/5 text-slate-400"}`}>
+                  Live
+                </span>
               </button>
 
               <button
                 onClick={() => setActiveTab("auditgpt")}
-                className={`pb-3 px-3 text-xs font-bold tracking-wider uppercase border-b-2 transition-all shrink-0 flex items-center gap-1.5 cursor-pointer
+                className={`px-4 py-2 text-[11px] font-black uppercase tracking-wider rounded-xl transition-all duration-300 flex items-center gap-2 cursor-pointer
                   ${activeTab === "auditgpt"
-                    ? "border-purple-500 text-purple-400 font-extrabold"
-                    : "border-transparent text-gray-400 hover:text-white"}`}
+                    ? "bg-purple-600/20 text-purple-400 border border-purple-500/35 shadow-[0_0_12px_rgba(139,92,246,0.25)]"
+                    : "border border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]"}`}
               >
-                <Sparkles className="w-4 h-4 text-yellow-450 animate-pulse" />
-                AuditGPT Chat
+                <Sparkles className="w-3.5 h-3.5 text-yellow-400 animate-pulse" />
+                <span>AuditGPT Chat</span>
+                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 animate-pulse">
+                  Ask
+                </span>
               </button>
             </>
           )}
@@ -1213,10 +1231,10 @@ export default function ResultCard({
                       return (
                         <div 
                           key={rule.ruleId} 
-                          className={`rounded-xl border transition-all duration-300 overflow-hidden
+                          className={`rounded-xl border transition-all duration-300 overflow-hidden backdrop-blur-sm
                             ${rule.passed 
-                              ? "bg-emerald-500/[0.005] border-emerald-500/10 hover:border-emerald-500/25" 
-                              : "bg-rose-500/[0.005] border-rose-500/10 hover:border-rose-500/25"}`}
+                              ? "bg-emerald-500/[0.005] border-emerald-500/10 hover:border-emerald-500/25 hover:shadow-[0_0_20px_rgba(16,185,129,0.06)]" 
+                              : "bg-rose-500/[0.005] border-rose-500/10 hover:border-rose-500/25 hover:shadow-[0_0_20px_rgba(244,63,94,0.06)]"}`}
                         >
                           <div 
                             onClick={() => toggleRule(rule.ruleId)}
@@ -1224,9 +1242,9 @@ export default function ResultCard({
                           >
                             <div className="flex items-center gap-3">
                               {rule.passed ? (
-                                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 shadow-lg shadow-emerald-400/10" />
+                                <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 drop-shadow-[0_0_6px_rgba(52,211,153,0.5)]" />
                               ) : (
-                                <XCircle className="w-5 h-5 text-rose-400 shrink-0 shadow-lg shadow-rose-400/10" />
+                                <XCircle className="w-5 h-5 text-rose-400 shrink-0 drop-shadow-[0_0_6px_rgba(248,113,113,0.5)]" />
                               )}
                               <div>
                                 <div className="flex items-center gap-2 flex-wrap">
