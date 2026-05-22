@@ -17,7 +17,8 @@ export default function ResultCard({
   setIsPlaying, 
   backendUrl,
   handleRenameAudit,
-  handleDeleteAudit
+  handleDeleteAudit,
+  isDarkMode
 }) {
   const [mode, setMode] = useState(audit?.mode || "ai");
   const [activeTab, setActiveTab] = useState("checklist");
@@ -396,7 +397,7 @@ export default function ResultCard({
         <span>
           {parts.map((part, i) => 
             regex.test(part) ? (
-              <mark key={i} className="bg-yellow-400/25 text-yellow-100 border-b-2 border-yellow-400/80 font-bold px-0.5 rounded-sm">{part}</mark>
+              <mark key={i} className="bg-yellow-400/25 text-slate-900 dark:text-yellow-100 border-b-2 border-yellow-400/80 font-bold px-0.5 rounded-sm">{part}</mark>
             ) : (
               part
             )
@@ -469,13 +470,13 @@ export default function ResultCard({
       )}
 
       {/* Main Glassmorphic Wrapper */}
-      <div className="p-6 md:p-8 rounded-[2rem] relative overflow-hidden bg-[#0d1326]/60 backdrop-blur-2xl border-t border-l border-white/20 border-b border-r border-white/5 shadow-[0_24px_80px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.15)] ring-1 ring-white/10 z-10">
+      <div className="p-6 md:p-8 rounded-[2rem] relative overflow-hidden bg-white/60 dark:bg-[#0d1326]/60 backdrop-blur-2xl border-t border-l border-purple-100 dark:border-white/20 border-b border-r border-purple-100/50 dark:border-white/5 shadow-[0_24px_80px_rgba(148,163,184,0.08)] dark:shadow-[0_24px_80px_rgba(0,0,0,0.8)] ring-1 ring-purple-100/50 dark:ring-white/10 z-10">
         
         {/* Header Row */}
-        <header className="mb-6 border-b border-white/5 pb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <header className="mb-6 border-b border-slate-205 dark:border-white/5 pb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-              <ClipboardList className="w-3.5 h-3.5 text-purple-400" /> Call Quality Audit Report
+            <p className="text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+              <ClipboardList className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Call Quality Audit Report
             </p>
             {isEditingName ? (
               <div className="flex items-center gap-2 max-w-full">
@@ -496,7 +497,7 @@ export default function ResultCard({
                     }
                   }}
                   autoFocus
-                  className="bg-black/60 border border-purple-500/50 rounded-xl px-3 py-1.5 text-sm font-bold text-white outline-none focus:ring-1 focus:ring-purple-500/50 flex-1 min-w-[200px]"
+                  className="bg-slate-100 dark:bg-black/60 border border-purple-200 dark:border-purple-500/50 rounded-xl px-3 py-1.5 text-sm font-bold text-slate-800 dark:text-white outline-none focus:ring-1 focus:ring-purple-500/50 flex-1 min-w-[200px]"
                 />
                 <button
                   onClick={() => {
@@ -523,7 +524,7 @@ export default function ResultCard({
               </div>
             ) : (
               <div className="flex items-center gap-3 group/report-title">
-                <h3 className="text-xl md:text-2xl font-black text-white tracking-tight leading-tight truncate">
+                <h3 className="text-xl md:text-2xl font-black text-slate-805 dark:text-white tracking-tight leading-tight truncate">
                   {audit.filename}
                 </h3>
                 <div className="flex items-center gap-1.5 opacity-0 group-hover/report-title:opacity-100 transition-opacity duration-200">
@@ -532,7 +533,7 @@ export default function ResultCard({
                       setEditedName(audit.filename);
                       setIsEditingName(true);
                     }}
-                    className="p-1.5 bg-white/5 hover:bg-purple-600 border border-white/5 hover:border-purple-500/40 rounded-lg text-slate-400 hover:text-white cursor-pointer transition-all"
+                    className="p-1.5 bg-slate-100 dark:bg-white/5 hover:bg-purple-650 border border-slate-205 dark:border-white/5 hover:border-purple-500/40 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white cursor-pointer transition-all"
                     title="Rename call file"
                   >
                     <Edit2 size={12} />
@@ -541,7 +542,7 @@ export default function ResultCard({
                     onClick={() => {
                       handleDeleteAudit(audit._id);
                     }}
-                    className="p-1.5 bg-white/5 hover:bg-rose-900/30 border border-white/5 hover:border-rose-500/40 rounded-lg text-slate-400 hover:text-rose-400 cursor-pointer transition-all"
+                    className="p-1.5 bg-slate-100 dark:bg-white/5 hover:bg-rose-900/30 border border-slate-205 dark:border-white/5 hover:border-rose-500/40 rounded-lg text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 cursor-pointer transition-all"
                     title="Delete audit record"
                   >
                     <Trash2 size={12} />
@@ -553,7 +554,7 @@ export default function ResultCard({
           
           <div className="flex flex-wrap items-center gap-3 shrink-0 self-start md:self-auto">
             {/* Mode toggler switcher */}
-            <div className="flex bg-white/5 border border-white/10 rounded-full p-0.5 text-[10px] select-none shadow-inner">
+            <div className="flex bg-slate-200/50 dark:bg-white/5 border border-slate-300 dark:border-white/10 rounded-full p-0.5 text-[10px] select-none shadow-inner">
               <button
                 onClick={() => {
                   setMode("normal");
@@ -562,7 +563,7 @@ export default function ResultCard({
                 className={`px-3.5 py-1.5 rounded-full font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
                   mode === "normal"
                     ? "bg-purple-600 border border-purple-500 text-white shadow-[0_0_12px_rgba(168,85,247,0.3)]"
-                    : "text-gray-400 hover:text-white"
+                    : "text-slate-500 hover:text-slate-805 dark:text-gray-400 dark:hover:text-white"
                 }`}
               >
                 Auditor
@@ -575,10 +576,10 @@ export default function ResultCard({
                 className={`px-3.5 py-1.5 rounded-full font-black uppercase tracking-wider transition-all duration-300 flex items-center gap-1 cursor-pointer ${
                   mode === "ai"
                     ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)]"
-                    : "text-gray-400 hover:text-white"
+                    : "text-slate-500 hover:text-slate-805 dark:text-gray-400 dark:hover:text-white"
                 }`}
               >
-                <Sparkles className="w-3 h-3 text-yellow-300 animate-pulse" />
+                <Sparkles className="w-3 h-3 text-yellow-500 dark:text-yellow-300 animate-pulse" />
                 AI Intel
               </button>
             </div>
@@ -592,7 +593,7 @@ export default function ResultCard({
 
         {/* Dynamic Premium Audio Player Cockpit */}
         {audit.audioUrl && (
-          <div className="mb-6 p-4 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-md flex flex-col sm:flex-row items-center gap-4 transition-all hover:bg-white/[0.03] hover:border-purple-500/20 shadow-inner">
+          <div className="mb-6 p-4 rounded-2xl bg-slate-100/60 dark:bg-white/[0.02] border border-slate-250 dark:border-white/5 backdrop-blur-md flex flex-col sm:flex-row items-center gap-4 transition-all hover:bg-slate-200/50 dark:hover:bg-white/[0.03] hover:border-purple-500/20 shadow-inner">
             
             {/* Play Button Wrapper */}
             <div className="relative shrink-0">
@@ -601,7 +602,7 @@ export default function ResultCard({
                 className={`w-12 h-12 rounded-xl flex items-center justify-center border transition-all duration-300 outline-none cursor-pointer
                   ${isCurrentAudioPlaying 
                     ? "bg-purple-600 border-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]" 
-                    : "bg-white/5 border-white/10 text-purple-300 hover:bg-purple-500/10 hover:border-purple-500/30 hover:text-white"
+                    : "bg-slate-200/60 border-slate-300 text-purple-650 hover:bg-purple-505/10 hover:border-purple-500/30 hover:text-purple-800 dark:bg-white/5 dark:border-white/10 dark:text-purple-300 dark:hover:text-white"
                   }`}
               >
                 {isCurrentAudioPlaying ? (
@@ -618,12 +619,12 @@ export default function ResultCard({
 
             {/* Scrubber & timelines */}
             <div className="flex-1 w-full flex flex-col gap-1.5">
-              <div className="flex items-center justify-between text-[10px] font-bold text-gray-400">
-                <span className="flex items-center gap-1.5 text-purple-300">
+              <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 dark:text-gray-400">
+                <span className="flex items-center gap-1.5 text-purple-600 dark:text-purple-300">
                   <Volume2 className="w-3.5 h-3.5" />
                   {isCurrentAudioPlaying ? "Streaming secure session..." : "Audio session paused"}
                 </span>
-                <span className="font-mono text-gray-300 bg-white/[0.03] px-2 py-0.5 rounded border border-white/5">
+                <span className="font-mono text-slate-700 dark:text-gray-300 bg-slate-200/65 dark:bg-white/[0.03] px-2 py-0.5 rounded border border-slate-300 dark:border-white/5">
                   {formatTime(currentTime)} / {formatTime(duration)}
                 </span>
               </div>
@@ -636,9 +637,9 @@ export default function ResultCard({
                   max={duration || 100}
                   value={currentTime}
                   onChange={handleScrub}
-                  className="w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer accent-purple-500 focus:outline-none"
+                  className="w-full h-1 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-purple-500 focus:outline-none"
                   style={{
-                    background: `linear-gradient(to right, #8b5cf6 0%, #8b5cf6 ${(currentTime / (duration || 100)) * 100}%, rgba(255,255,255,0.1) ${(currentTime / (duration || 100)) * 100}%, rgba(255,255,255,0.1) 100%)`
+                    background: `linear-gradient(to right, #8b5cf6 0%, #8b5cf6 ${(currentTime / (duration || 100)) * 100}%, ${isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"} ${(currentTime / (duration || 100)) * 100}%, ${isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)"} 100%)`
                   }}
                 />
               </div>
@@ -664,20 +665,20 @@ export default function ResultCard({
 
         {/* Real-time assist warning alert overlay */}
         {activeSuggestion && (
-          <div className="mb-4 p-3 rounded-xl bg-purple-950/70 border border-purple-500/30 text-white flex items-center gap-3 animate-fade-in shadow-[0_0_20px_rgba(168,85,247,0.25)] relative overflow-hidden backdrop-blur-md">
-            <span className="absolute -inset-1 bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-transparent pointer-events-none" />
-            <div className="w-7 h-7 rounded-lg bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-300 shrink-0">
-              <Zap className="w-4 h-4 text-purple-300 animate-bounce" />
+          <div className="mb-4 p-3 rounded-xl bg-purple-50 dark:bg-purple-950/70 border border-purple-200 dark:border-purple-500/30 text-purple-900 dark:text-white flex items-center gap-3 animate-fade-in shadow-[0_4px_20px_rgba(168,85,247,0.1)] dark:shadow-[0_0_20px_rgba(168,85,247,0.25)] relative overflow-hidden backdrop-blur-md">
+            <span className="absolute -inset-1 bg-gradient-to-r from-purple-500/5 dark:from-purple-500/10 via-indigo-500/5 dark:via-indigo-500/10 to-transparent pointer-events-none" />
+            <div className="w-7 h-7 rounded-lg bg-purple-100 dark:bg-purple-500/20 border border-purple-200 dark:border-purple-500/40 flex items-center justify-center text-purple-650 dark:text-purple-300 shrink-0">
+              <Zap className="w-4 h-4 text-purple-650 dark:text-purple-300 animate-bounce" />
             </div>
             <div className="flex-1 min-w-0">
-              <span className="text-[8.5px] font-black text-purple-400 uppercase tracking-widest block">
+              <span className="text-[8.5px] font-black text-purple-655 dark:text-purple-400 uppercase tracking-widest block">
                 Live Assist Simulator ({formatTime(activeSuggestion.timestamp)})
               </span>
-              <p className="text-[11px] font-extrabold text-purple-100 truncate">
+              <p className="text-[11px] font-extrabold text-purple-950 dark:text-purple-100 truncate">
                 {activeSuggestion.suggestion}
               </p>
             </div>
-            <span className="text-[7.5px] font-black text-purple-400 bg-purple-900/40 px-2 py-0.5 rounded border border-purple-500/20 uppercase tracking-wider shrink-0 select-none animate-pulse">
+            <span className="text-[7.5px] font-black text-purple-700 dark:text-purple-200 bg-purple-100/60 dark:bg-purple-900/40 px-2 py-0.5 rounded border border-purple-200 dark:border-purple-500/20 uppercase tracking-wider shrink-0 select-none animate-pulse">
               {activeSuggestion.category}
             </span>
           </div>
@@ -689,12 +690,12 @@ export default function ResultCard({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
             
             {/* Score Ring Widget */}
-            <div className={`flex flex-col items-center justify-center p-5 rounded-2xl border ${scoreBgClass} backdrop-blur-sm relative overflow-hidden`}>
-              <div className="absolute -top-1 -right-2 text-white/5 font-black text-6xl pointer-events-none uppercase select-none tracking-tighter">QA</div>
+            <div className={`flex flex-col items-center justify-center p-5 rounded-2xl border ${isDarkMode ? scoreBgClass : "bg-slate-50/65 border-slate-200/90 shadow-[0_4px_24px_rgba(148,163,184,0.05)]"} backdrop-blur-sm relative overflow-hidden`}>
+              <div className="absolute -top-1 -right-2 text-slate-200/40 dark:text-white/5 font-black text-6xl pointer-events-none uppercase select-none tracking-tighter">QA</div>
               
               <div className="relative w-24 h-24 mb-3">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                  <circle className="text-white/5 stroke-current" strokeWidth="7" cx="50" cy="50" r={radius} fill="transparent" />
+                  <circle className="text-slate-200 dark:text-white/5 stroke-current" strokeWidth="7" cx="50" cy="50" r={radius} fill="transparent" />
                   <circle
                     className={`${scoreStrokeClass} stroke-current transition-all duration-1000 ease-out`}
                     strokeWidth="7"
@@ -712,34 +713,34 @@ export default function ResultCard({
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className={`text-2xl font-black leading-none tracking-tighter ${scoreColorClass}`}>{percentage}%</span>
-                  <span className="text-[7.5px] text-gray-400 font-extrabold uppercase tracking-widest mt-1">Score</span>
+                  <span className="text-[7.5px] text-slate-400 dark:text-gray-400 font-extrabold uppercase tracking-widest mt-1">Score</span>
                 </div>
               </div>
 
               <div className="text-center">
-                <span className="text-xs font-bold text-slate-200 block">Compliance Audit</span>
-                <span className="text-[10px] text-slate-400 font-bold">{score} / {maxScore} points weight</span>
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-200 block">Compliance Audit</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">{score} / {maxScore} points weight</span>
               </div>
             </div>
 
             {/* Speech Metrics turn balance details */}
-            <div className="md:col-span-2 p-5 rounded-2xl bg-white/[0.02] border border-white/5 flex flex-col justify-between backdrop-blur-sm">
+            <div className="md:col-span-2 p-5 rounded-2xl bg-slate-55/65 dark:bg-white/[0.02] border border-slate-205 dark:border-white/5 flex flex-col justify-between backdrop-blur-sm">
               <div className="flex items-center justify-between mb-3.5">
-                <h4 className="text-[10px] font-black uppercase text-purple-400 tracking-widest flex items-center gap-1.5">
-                  <Mic className="w-3.5 h-3.5 text-purple-400" /> Dialogue Metrics
+                <h4 className="text-[10px] font-black uppercase text-purple-650 dark:text-purple-400 tracking-widest flex items-center gap-1.5">
+                  <Mic className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Dialogue Metrics
                 </h4>
-                <span className="text-[10px] text-gray-300 font-bold flex items-center gap-1 bg-white/[0.03] px-2.5 py-0.5 rounded-full border border-white/5">
-                  <Clock className="w-3 h-3 text-purple-400" /> {formatTime(totalCallDuration)} duration
+                <span className="text-[10px] text-slate-700 dark:text-gray-300 font-bold flex items-center gap-1 bg-slate-200/60 dark:bg-white/[0.03] px-2.5 py-0.5 rounded-full border border-slate-300 dark:border-white/5">
+                  <Clock className="w-3 h-3 text-purple-600 dark:text-purple-400" /> {formatTime(totalCallDuration)} duration
                 </span>
               </div>
 
-              <div className="w-full bg-white/[0.01] rounded-xl p-3 border border-white/[0.03]">
-                <div className="flex justify-between text-[10px] font-black text-gray-300 mb-2">
-                  <span className="text-purple-300">Agent Talk Time ({agentSpeechPct}%)</span>
-                  <span className="text-blue-300">Customer Talk Time ({customerSpeechPct}%)</span>
+              <div className="w-full bg-slate-100/50 dark:bg-white/[0.01] rounded-xl p-3 border border-slate-200/80 dark:border-white/[0.03]">
+                <div className="flex justify-between text-[10px] font-black text-slate-650 dark:text-gray-300 mb-2">
+                  <span className="text-purple-600 dark:text-purple-300">Agent Talk Time ({agentSpeechPct}%)</span>
+                  <span className="text-blue-600 dark:text-blue-300">Customer Talk Time ({customerSpeechPct}%)</span>
                 </div>
 
-                <div className="w-full h-3.5 bg-white/[0.06] rounded-full flex overflow-hidden border border-white/5 shadow-inner">
+                <div className="w-full h-3.5 bg-slate-250 dark:bg-white/[0.06] rounded-full flex overflow-hidden border border-slate-300 dark:border-white/5 shadow-inner">
                   <div className="h-full bg-gradient-to-r from-purple-600 to-indigo-500 transition-all duration-700 shadow-md relative" style={{ width: `${agentSpeechPct}%` }}>
                     <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.05)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.05)_50%,rgba(255,255,255,0.05)_75%,transparent_75%,transparent)] bg-[length:12px_12px] opacity-40"></div>
                   </div>
@@ -748,20 +749,20 @@ export default function ResultCard({
                   </div>
                 </div>
 
-                <div className="flex justify-between text-[9px] text-slate-400 mt-2 font-bold uppercase tracking-wider">
+                <div className="flex justify-between text-[9px] text-slate-500 dark:text-slate-400 mt-2 font-bold uppercase tracking-wider">
                   <span>Turns: {utterances.filter(u => u.speaker?.toUpperCase().includes("AGENT") || u.speaker?.toUpperCase().includes("A")).length}</span>
                   <span>Turns: {utterances.filter(u => !(u.speaker?.toUpperCase().includes("AGENT") || u.speaker?.toUpperCase().includes("A"))).length}</span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 mt-2.5 pt-2 border-t border-white/[0.04]">
+              <div className="grid grid-cols-2 gap-4 mt-2.5 pt-2 border-t border-slate-205 dark:border-white/[0.04]">
                 <div className="text-left">
-                  <span className="text-[9px] text-gray-500 block font-bold uppercase tracking-widest">Agent Pace</span>
-                  <span className="text-xs font-black text-purple-300">{agentWpm} WPM <span className="text-[9px] font-bold text-gray-500">Avg</span></span>
+                  <span className="text-[9px] text-slate-450 dark:text-gray-500 block font-bold uppercase tracking-widest">Agent Pace</span>
+                  <span className="text-xs font-black text-purple-650 dark:text-purple-300">{agentWpm} WPM <span className="text-[9px] font-bold text-slate-450 dark:text-gray-500">Avg</span></span>
                 </div>
                 <div className="text-right">
-                  <span className="text-[9px] text-gray-500 block font-bold uppercase tracking-widest">Customer Pace</span>
-                  <span className="text-xs font-black text-blue-300">{customerWpm} WPM <span className="text-[9px] font-bold text-gray-500">Avg</span></span>
+                  <span className="text-[9px] text-slate-450 dark:text-gray-500 block font-bold uppercase tracking-widest">Customer Pace</span>
+                  <span className="text-xs font-black text-blue-650 dark:text-blue-300">{customerWpm} WPM <span className="text-[9px] font-bold text-slate-450 dark:text-gray-500">Avg</span></span>
                 </div>
               </div>
             </div>
@@ -959,27 +960,27 @@ export default function ResultCard({
 
         {/* SENTIMENT TRAJECTORY BEZIER GRAPH */}
         {mode === "ai" && utterances.length > 1 && (
-          <div className="mb-6 p-4 rounded-2xl bg-white/[0.01] border border-white/5 backdrop-blur-sm">
+          <div className="mb-6 p-4 rounded-2xl bg-slate-55/65 dark:bg-white/[0.01] border border-slate-200 dark:border-white/5 backdrop-blur-sm">
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-[10px] font-black uppercase text-indigo-400 tracking-widest flex items-center gap-1.5">
-                <Activity className="w-3.5 h-3.5 text-indigo-400" /> Emotional Sentiment Bezier Trajectory
+              <h4 className="text-[10px] font-black uppercase text-indigo-650 dark:text-indigo-400 tracking-widest flex items-center gap-1.5">
+                <Activity className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" /> Emotional Sentiment Bezier Trajectory
               </h4>
-              <span className="text-[8px] text-gray-500 font-bold uppercase tracking-wider">
+              <span className="text-[8px] text-slate-500 dark:text-gray-500 font-bold uppercase tracking-wider">
                 Turn-by-Turn Sentiment Wave
               </span>
             </div>
 
-            <div className="relative w-full h-24 bg-black/45 rounded-xl border border-white/5 overflow-hidden flex items-center justify-center p-2 shadow-inner">
+            <div className="relative w-full h-24 bg-slate-100/80 dark:bg-black/45 rounded-xl border border-slate-250 dark:border-white/5 overflow-hidden flex items-center justify-center p-2 shadow-inner">
               <svg className="w-full h-full" viewBox="0 0 500 100" preserveAspectRatio="none">
                 {/* Horizontal baseline guides */}
-                <line x1="0" y1="20" x2="500" y2="20" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="3 3" />
-                <line x1="0" y1="50" x2="500" y2="50" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="3 3" />
-                <line x1="0" y1="80" x2="500" y2="80" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="3 3" />
+                <line x1="0" y1="20" x2="500" y2="20" stroke={isDarkMode ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.06)"} strokeWidth="1" strokeDasharray="3 3" />
+                <line x1="0" y1="50" x2="500" y2="50" stroke={isDarkMode ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.06)"} strokeWidth="1" strokeDasharray="3 3" />
+                <line x1="0" y1="80" x2="500" y2="80" stroke={isDarkMode ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.06)"} strokeWidth="1" strokeDasharray="3 3" />
 
                 {/* Level baseline labels */}
-                <text x="5" y="16" fill="rgba(16,185,129,0.3)" fontSize="6" fontWeight="bold">POS</text>
-                <text x="5" y="46" fill="rgba(59,130,246,0.3)" fontSize="6" fontWeight="bold">NEU</text>
-                <text x="5" y="76" fill="rgba(244,63,94,0.3)" fontSize="6" fontWeight="bold">NEG</text>
+                <text x="5" y="16" fill={isDarkMode ? "rgba(16,185,129,0.5)" : "rgba(16,185,129,0.8)"} fontSize="6" fontWeight="bold">POS</text>
+                <text x="5" y="46" fill={isDarkMode ? "rgba(59,130,246,0.5)" : "rgba(59,130,246,0.8)"} fontSize="6" fontWeight="bold">NEU</text>
+                <text x="5" y="76" fill={isDarkMode ? "rgba(244,63,94,0.5)" : "rgba(244,63,94,0.8)"} fontSize="6" fontWeight="bold">NEG</text>
 
                 {/* Plot calculations */}
                 {(() => {
@@ -1073,36 +1074,36 @@ export default function ResultCard({
 
         {/* Objective and Executive Summary details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div className="p-4 rounded-2xl bg-white/[0.01] border border-white/5 hover:bg-white/[0.02] hover:border-purple-500/20 transition-all shadow-sm">
-            <h4 className="text-[10px] font-black uppercase text-purple-400 tracking-wider mb-2 flex items-center gap-1.5">
-              <Target className="w-3.5 h-3.5 text-purple-400" /> Call Objective
+          <div className="p-4 rounded-2xl bg-slate-55/65 dark:bg-white/[0.01] border border-slate-205 dark:border-white/5 hover:bg-slate-100/60 dark:hover:bg-white/[0.02] hover:border-purple-500/20 transition-all shadow-sm">
+            <h4 className="text-[10px] font-black uppercase text-purple-650 dark:text-purple-400 tracking-wider mb-2 flex items-center gap-1.5">
+              <Target className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Call Objective
             </h4>
-            <p className="text-slate-300 text-xs leading-relaxed font-medium">
+            <p className="text-slate-700 dark:text-slate-300 text-xs leading-relaxed font-medium">
               {audit.objective || "No explicit objective extracted."}
             </p>
           </div>
-          <div className="p-4 rounded-2xl bg-white/[0.01] border border-white/5 hover:bg-white/[0.02] hover:border-pink-500/20 transition-all shadow-sm">
-            <h4 className="text-[10px] font-black uppercase text-pink-400 tracking-wider mb-2 flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5 text-pink-400" /> Executive Summary
+          <div className="p-4 rounded-2xl bg-slate-55/65 dark:bg-white/[0.01] border border-slate-205 dark:border-white/5 hover:bg-slate-100/60 dark:hover:bg-white/[0.02] hover:border-pink-500/20 transition-all shadow-sm">
+            <h4 className="text-[10px] font-black uppercase text-pink-650 dark:text-pink-400 tracking-wider mb-2 flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5 text-pink-650 dark:text-pink-400" /> Executive Summary
             </h4>
-            <p className="text-slate-300 text-xs leading-relaxed font-medium">
+            <p className="text-slate-700 dark:text-slate-300 text-xs leading-relaxed font-medium">
               {audit.conclusion || "No conclusion provided."}
             </p>
           </div>
         </div>
 
         {/* TAB SYSTEM NAVIGATION */}
-        <div className="flex flex-wrap gap-2 p-1.5 rounded-2xl bg-[#060916]/80 border border-white/5 mb-6 backdrop-blur-md">
+        <div className="flex flex-wrap gap-2 p-1.5 rounded-2xl bg-slate-200/50 dark:bg-[#060916]/80 border border-slate-300 dark:border-white/5 mb-6 backdrop-blur-md">
           <button
             onClick={() => setActiveTab("checklist")}
             className={`px-4 py-2 text-[11px] font-black uppercase tracking-wider rounded-xl transition-all duration-300 flex items-center gap-2 cursor-pointer
               ${activeTab === "checklist"
-                ? "bg-purple-600/20 text-purple-400 border border-purple-500/35 shadow-[0_0_12px_rgba(139,92,246,0.25)]"
-                : "border border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]"}`}
+                ? "bg-purple-100 text-purple-705 border border-purple-200 shadow-[0_4px_12px_rgba(168,85,247,0.08)] dark:bg-purple-600/20 dark:text-purple-400 dark:border-purple-500/35 dark:shadow-[0_0_12px_rgba(139,92,246,0.25)]"
+                : "border border-transparent text-slate-600 hover:text-slate-808 hover:bg-slate-300/40 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-white/[0.03]"}`}
           >
             <ClipboardList className="w-3.5 h-3.5" />
             <span>Rules</span>
-            <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black ${activeTab === "checklist" ? "bg-purple-500/35 text-purple-200" : "bg-white/5 text-slate-400"}`}>
+            <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black ${activeTab === "checklist" ? "bg-purple-200 text-purple-800 dark:bg-purple-500/35 dark:text-purple-200" : "bg-slate-250 dark:bg-white/5 text-slate-500 dark:text-slate-400"}`}>
               {passedCount}/{totalRules}
             </span>
           </button>
@@ -1112,12 +1113,12 @@ export default function ResultCard({
               onClick={() => setActiveTab("analytics")}
               className={`px-4 py-2 text-[11px] font-black uppercase tracking-wider rounded-xl transition-all duration-300 flex items-center gap-2 cursor-pointer
                 ${activeTab === "analytics"
-                  ? "bg-purple-600/20 text-purple-400 border border-purple-500/35 shadow-[0_0_12px_rgba(139,92,246,0.25)]"
-                  : "border border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]"}`}
+                  ? "bg-purple-100 text-purple-705 border border-purple-200 shadow-[0_4px_12px_rgba(168,85,247,0.08)] dark:bg-purple-600/20 dark:text-purple-400 dark:border-purple-500/35 dark:shadow-[0_0_12px_rgba(139,92,246,0.25)]"
+                  : "border border-transparent text-slate-600 hover:text-slate-850 hover:bg-slate-300/40 dark:text-slate-400 dark:hover:text-slate-200 dark:hover:bg-white/[0.03]"}`}
             >
               <BarChart3 className="w-3.5 h-3.5" />
               <span>Analytics</span>
-              <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black ${activeTab === "analytics" ? "bg-purple-500/35 text-purple-200" : "bg-white/5 text-slate-400"}`}>
+              <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black ${activeTab === "analytics" ? "bg-purple-200 text-purple-800 dark:bg-purple-500/35 dark:text-purple-200" : "bg-slate-250 dark:bg-white/5 text-slate-500 dark:text-slate-400"}`}>
                 <TrendingUp className="w-2 h-2" />
               </span>
             </button>
@@ -1274,17 +1275,17 @@ export default function ResultCard({
               {mode === "normal" ? (
                 /* NORMAL AUDITOR WORKSPACE checklist form */
                 <div className="space-y-4">
-                  <div className="p-3.5 rounded-xl bg-purple-500/5 border border-purple-500/10 flex items-center justify-between gap-4 mb-2 shadow-md">
+                  <div className="p-3.5 rounded-xl bg-purple-50/60 dark:bg-purple-500/5 border border-purple-250 dark:border-purple-500/10 flex items-center justify-between gap-4 mb-2 shadow-md">
                     <div>
-                      <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1">
-                        <ClipboardList className="w-4 h-4 text-purple-400" /> Manual Scoring Workspace
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider flex items-center gap-1">
+                        <ClipboardList className="w-4 h-4 text-purple-650 dark:text-purple-400" /> Manual Scoring Workspace
                       </h4>
-                      <p className="text-[10px] text-slate-400 mt-0.5">Toggle rules to recalculate scores dynamically. Gemini's extractions serve as baseline suggestions.</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Toggle rules to recalculate scores dynamically. Gemini's extractions serve as baseline suggestions.</p>
                     </div>
                     {/* Live Recalculated score */}
-                    <div className="bg-purple-500/10 border border-purple-500/30 px-3 py-1.5 rounded-xl text-center shrink-0">
-                      <span className="text-[8px] font-black text-purple-300 block uppercase tracking-widest">Manual Score</span>
-                      <span className="text-sm font-black text-purple-100 font-mono">
+                    <div className="bg-purple-100/80 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/30 px-3 py-1.5 rounded-xl text-center shrink-0">
+                      <span className="text-[8px] font-black text-purple-700 dark:text-purple-300 block uppercase tracking-widest">Manual Score</span>
+                      <span className="text-sm font-black text-purple-950 dark:text-purple-100 font-mono">
                         {(() => {
                           let runningScore = 0;
                           localRules.forEach(lr => {
@@ -1309,8 +1310,8 @@ export default function ResultCard({
                           key={rule.id}
                           className={`p-5 rounded-2xl border transition-all duration-300 flex flex-col gap-3 backdrop-blur-md shadow-inner ${
                             ruleState.passed 
-                              ? "bg-emerald-500/[0.02] border-emerald-500/15 hover:border-emerald-500/30 hover:bg-emerald-500/[0.04]" 
-                              : "bg-white/[0.02] border-white/10 hover:border-purple-500/30 hover:bg-white/[0.04]"
+                              ? "bg-emerald-50/30 dark:bg-emerald-500/[0.02] border-emerald-100 dark:border-emerald-500/15 hover:border-emerald-350 dark:hover:border-emerald-500/30 hover:bg-emerald-100/20 dark:hover:bg-emerald-500/[0.04]" 
+                              : "bg-slate-50/60 dark:bg-white/[0.02] border-slate-200 dark:border-white/10 hover:border-purple-300 dark:hover:border-purple-500/30 hover:bg-slate-100/50 dark:hover:bg-white/[0.04]"
                           }`}
                         >
                           <div className="flex items-start gap-4 w-full">
@@ -1319,38 +1320,38 @@ export default function ResultCard({
                                 type="checkbox"
                                 checked={ruleState.passed}
                                 onChange={() => handleToggleLocalRule(rule.id)}
-                                className="w-5 h-5 rounded-md border-white/20 bg-black/40 text-purple-500 focus:ring-purple-500/50 focus:ring-2 focus:ring-offset-0 cursor-pointer accent-purple-500 transition-all shadow-inner"
+                                className="w-5 h-5 rounded-md border-slate-300 dark:border-white/20 bg-white/80 dark:bg-black/40 text-purple-650 focus:ring-purple-500/50 focus:ring-2 focus:ring-offset-0 cursor-pointer accent-purple-500 transition-all shadow-inner"
                               />
                             </div>
                             
                             <div className="flex-1 min-w-0 flex flex-col gap-1.5">
                               <div className="flex flex-wrap items-center justify-between gap-2">
                                 <div className="flex items-center gap-2.5 flex-wrap">
-                                  <h5 className="font-black text-sm text-white uppercase tracking-wider">{rule.id}</h5>
-                                  <span className="text-[9px] uppercase tracking-widest font-black px-2 py-0.5 rounded-md border border-purple-500/20 bg-purple-500/10 text-purple-300 shadow-sm">
+                                  <h5 className="font-black text-sm text-slate-800 dark:text-white uppercase tracking-wider">{rule.id}</h5>
+                                  <span className="text-[9px] uppercase tracking-widest font-black px-2 py-0.5 rounded-md border border-purple-200 dark:border-purple-500/20 bg-purple-100/80 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 shadow-sm">
                                     Weight: {rule.weight}
                                   </span>
-                                  <span className={`text-[8px] uppercase tracking-widest font-black px-2 py-0.5 rounded-md border shadow-sm ${rule.severity === "HIGH" ? "bg-rose-500/10 border-rose-500/20 text-rose-300" : "bg-blue-500/10 border-blue-500/20 text-blue-300"}`}>
+                                  <span className={`text-[8px] uppercase tracking-widest font-black px-2 py-0.5 rounded-md border shadow-sm ${rule.severity === "HIGH" ? "bg-rose-50/80 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-700 dark:text-rose-300" : "bg-blue-50/80 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/20 text-blue-700 dark:text-blue-300"}`}>
                                     Severity: {rule.severity}
                                   </span>
                                 </div>
-                                <span className={`text-[10px] font-black uppercase tracking-widest ${ruleState.passed ? "text-emerald-400" : "text-gray-500"}`}>
+                                <span className={`text-[10px] font-black uppercase tracking-widest ${ruleState.passed ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400 dark:text-gray-500"}`}>
                                   {ruleState.passed ? "Passed" : "Pending"}
                                 </span>
                               </div>
                               
-                              <p className="text-xs text-gray-400 font-medium leading-relaxed mb-1 pr-4">{rule.description}</p>
+                              <p className="text-xs text-slate-650 dark:text-gray-400 font-medium leading-relaxed mb-1 pr-4">{rule.description}</p>
                               
                               <div className="relative mt-1">
                                 <div className="absolute top-2.5 left-3">
-                                  <MessageSquare className="w-3.5 h-3.5 text-gray-500" />
+                                  <MessageSquare className="w-3.5 h-3.5 text-slate-400 dark:text-gray-500" />
                                 </div>
                                 <input
                                   type="text"
                                   placeholder="Add audit justification or transcript citations..."
                                   value={ruleState.evidence}
                                   onChange={(e) => handleEvidenceChange(rule.id, e.target.value)}
-                                  className="w-full pl-9 pr-4 py-2 rounded-xl bg-black/40 border border-white/10 text-xs text-slate-300 focus:outline-none focus:border-purple-500/50 transition-all font-mono shadow-inner placeholder-gray-600"
+                                  className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-100/80 dark:bg-black/40 border border-slate-300 dark:border-white/10 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-purple-400 dark:focus:border-purple-500/50 transition-all font-mono shadow-inner placeholder-slate-400 dark:placeholder-gray-600"
                                 />
                               </div>
                             </div>
@@ -1375,25 +1376,25 @@ export default function ResultCard({
                 <>
                   <div className="flex flex-col sm:flex-row gap-3 items-center justify-between mb-4">
                     <div className="relative w-full sm:max-w-xs">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-450 dark:text-gray-500" />
                       <input
                         type="text"
                         placeholder="Search audit rules..."
                         value={ruleSearch}
                         onChange={(e) => setRuleSearch(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 rounded-xl bg-white/[0.02] border border-white/5 text-xs text-white focus:outline-none focus:border-purple-500/50 transition-all placeholder-gray-500"
+                        className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-100/80 dark:bg-white/[0.02] border border-slate-300 dark:border-white/5 text-slate-800 dark:text-white focus:outline-none focus:border-purple-500/50 transition-all placeholder-slate-400 dark:placeholder-gray-500"
                       />
                     </div>
 
-                    <div className="flex gap-1 bg-white/[0.01] border border-white/5 rounded-lg p-0.5 text-[10px] font-bold">
+                    <div className="flex gap-1 bg-slate-100/80 dark:bg-white/[0.01] border border-slate-300 dark:border-white/5 rounded-lg p-0.5 text-[10px] font-bold">
                       {["ALL", "PASSED", "FAILED"].map((status) => (
                         <button
                           key={status}
                           onClick={() => setRuleFilter(status)}
-                          className={`px-3.5 py-1 rounded transition-all
+                          className={`px-3.5 py-1 rounded transition-all cursor-pointer
                             ${ruleFilter === status 
-                              ? "bg-purple-500/20 text-purple-300 border border-purple-500/30" 
-                              : "text-gray-400 hover:text-white"}`}
+                              ? "bg-purple-100 text-purple-700 border border-purple-200 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-500/30" 
+                              : "text-slate-500 hover:text-slate-805 dark:text-gray-400 dark:hover:text-white"}`}
                         >
                           {status === "ALL" ? "All" : status === "PASSED" ? "Passed" : "Failed"}
                         </button>
@@ -1402,7 +1403,7 @@ export default function ResultCard({
                   </div>
 
                   {filteredRuleResults.length === 0 ? (
-                    <div className="text-center py-12 text-gray-500 border border-dashed border-white/5 rounded-xl bg-white/[0.01]">
+                    <div className="text-center py-12 text-slate-500 border border-dashed border-slate-300 dark:border-white/5 rounded-xl bg-slate-50/50 dark:bg-white/[0.01]">
                       No rules match your filters.
                     </div>
                   ) : (
@@ -1410,14 +1411,14 @@ export default function ResultCard({
                       const isExpanded = expandedRule === rule.ruleId;
                       const weight = rule.weight ?? 10;
                       let classificationLabel = "Standard Criteria";
-                      let classBadgeClass = "bg-purple-500/10 text-purple-300 border-purple-500/20";
+                      let classBadgeClass = "bg-purple-55 dark:bg-purple-500/10 text-purple-705 dark:text-purple-300 border-purple-200 dark:border-purple-500/20";
                       
                       if (weight >= 20) {
                         classificationLabel = "CRITICAL COMPLIANCE";
-                        classBadgeClass = "bg-rose-500/10 text-rose-300 border-rose-500/20 animate-pulse";
+                        classBadgeClass = "bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-500/20 animate-pulse";
                       } else if (weight < 10) {
                         classificationLabel = "Supporting Guideline";
-                        classBadgeClass = "bg-blue-500/10 text-blue-300 border-blue-500/20";
+                        classBadgeClass = "bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-500/20";
                       }
 
                       return (
@@ -1425,8 +1426,8 @@ export default function ResultCard({
                           key={rule.ruleId} 
                           className={`rounded-2xl border transition-all duration-300 overflow-hidden backdrop-blur-md shadow-inner mb-3
                             ${rule.passed 
-                              ? "bg-emerald-500/[0.02] border-emerald-500/15 hover:border-emerald-500/30 hover:shadow-[0_4px_24px_rgba(16,185,129,0.08)]" 
-                              : "bg-rose-500/[0.02] border-rose-500/15 hover:border-rose-500/30 hover:shadow-[0_4px_24px_rgba(244,63,94,0.08)]"}`}
+                              ? "bg-emerald-50/30 dark:bg-emerald-500/[0.02] border-emerald-100 dark:border-emerald-500/15 hover:border-emerald-300 dark:hover:border-emerald-500/30 hover:shadow-[0_4px_24px_rgba(16,185,129,0.04)] dark:hover:shadow-[0_4px_24px_rgba(16,185,129,0.08)]" 
+                              : "bg-rose-50/30 dark:bg-rose-500/[0.02] border-rose-100 dark:border-rose-500/15 hover:border-rose-300 dark:hover:border-rose-500/30 hover:shadow-[0_4px_24px_rgba(244,63,94,0.04)] dark:hover:shadow-[0_4px_24px_rgba(244,63,94,0.08)]"}`}
                         >
                           <div 
                             onClick={() => toggleRule(rule.ruleId)}
@@ -1434,16 +1435,16 @@ export default function ResultCard({
                           >
                             <div className="shrink-0 mt-0.5">
                               {rule.passed ? (
-                                <CheckCircle2 className="w-5 h-5 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
+                                <CheckCircle2 className="w-5 h-5 text-emerald-500 dark:text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.4)] dark:drop-shadow-[0_0_8px_rgba(52,211,153,0.6)]" />
                               ) : (
-                                <XCircle className="w-5 h-5 text-rose-400 drop-shadow-[0_0_8px_rgba(248,113,113,0.6)]" />
+                                <XCircle className="w-5 h-5 text-rose-550 dark:text-rose-400 drop-shadow-[0_0_8px_rgba(248,113,113,0.4)] dark:drop-shadow-[0_0_8px_rgba(248,113,113,0.6)]" />
                               )}
                             </div>
                             
                             <div className="flex-1 min-w-0">
                               <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
                                 <div className="flex items-center gap-2.5 flex-wrap">
-                                  <h5 className="font-black text-sm text-white uppercase tracking-wider">{rule.ruleId}</h5>
+                                  <h5 className="font-black text-sm text-slate-800 dark:text-white uppercase tracking-wider">{rule.ruleId}</h5>
                                   <span className={`text-[8px] uppercase tracking-widest font-black px-2 py-0.5 rounded-md border shadow-sm ${classBadgeClass}`}>
                                     {classificationLabel} (W: {weight})
                                   </span>
@@ -1451,33 +1452,33 @@ export default function ResultCard({
                                 <div className="flex items-center gap-3">
                                   <span className={`text-[9px] uppercase font-black px-2.5 py-0.5 rounded-md border shadow-sm tracking-widest hidden sm:inline-block
                                     ${rule.passed 
-                                      ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" 
-                                      : "bg-rose-500/10 border-rose-500/20 text-rose-400"}`}
+                                      ? "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 text-emerald-700 dark:text-emerald-450" 
+                                      : "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-705 dark:text-rose-450"}`}
                                   >
                                     {rule.passed ? "Passed" : "Failed"}
                                   </span>
-                                  <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center border border-white/5 group-hover:bg-white/10 transition-colors">
+                                  <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center border border-slate-200 dark:border-white/5 group-hover:bg-slate-200 dark:group-hover:bg-white/10 transition-colors">
                                     {isExpanded ? (
-                                      <ChevronUp className="w-3.5 h-3.5 text-gray-400" />
+                                      <ChevronUp className="w-3.5 h-3.5 text-slate-500 dark:text-gray-400" />
                                     ) : (
-                                      <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+                                      <ChevronDown className="w-3.5 h-3.5 text-slate-500 dark:text-gray-400" />
                                     )}
                                   </div>
                                 </div>
                               </div>
-                              <p className="text-xs text-gray-400 font-medium leading-relaxed pr-8 line-clamp-1 sm:line-clamp-none">
+                              <p className="text-xs text-slate-650 dark:text-gray-400 font-medium leading-relaxed pr-8 line-clamp-1 sm:line-clamp-none">
                                 {rule.description || `Criteria mapping for ${rule.ruleId}.`}
                               </p>
                             </div>
                           </div>
 
                           {isExpanded && (
-                            <div className="px-4 pb-4 pt-1.5 border-t border-white/[0.04] bg-[#070c18]/40 animate-fade-in">
-                              <div className="text-[10px] text-purple-400 font-black uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                                <Info className="w-3.5 h-3.5 text-purple-400" /> Extracted Conversational Evidence
+                            <div className="px-4 pb-4 pt-1.5 border-t border-slate-200 dark:border-white/[0.04] bg-slate-100/60 dark:bg-[#070c18]/40 animate-fade-in">
+                              <div className="text-[10px] text-purple-700 dark:text-purple-400 font-black uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                                <Info className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" /> Extracted Conversational Evidence
                               </div>
-                              <div className="p-3.5 rounded-xl bg-black/40 border border-white/5 text-[11px] text-slate-300 leading-relaxed italic relative">
-                                <span className="text-purple-500 text-3xl font-serif absolute -top-2 left-1.5 select-none pointer-events-none opacity-30">“</span>
+                              <div className="p-3.5 rounded-xl bg-white/80 dark:bg-black/40 border border-slate-200 dark:border-white/5 text-[11px] text-slate-705 dark:text-slate-300 leading-relaxed italic relative">
+                                <span className="text-purple-550 text-3xl font-serif absolute -top-2 left-1.5 select-none pointer-events-none opacity-30">“</span>
                                 <p className="pl-5 pr-2 whitespace-pre-wrap font-medium">
                                   {rule.evidence || "No transcript quotes or explicit evidence found in this call."}
                                 </p>
@@ -1498,25 +1499,25 @@ export default function ResultCard({
             <div className="space-y-4 animate-fade-in">
               <div className="flex flex-col sm:flex-row gap-3 items-center justify-between mb-3">
                 <div className="relative w-full sm:max-w-xs">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-450 dark:text-gray-500" />
                   <input
                     type="text"
                     placeholder="Search detected risks..."
                     value={riskSearch}
                     onChange={(e) => setRiskSearch(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2 rounded-xl bg-white/[0.02] border border-white/5 text-xs text-white focus:outline-none focus:border-purple-500/50 placeholder-gray-500"
+                    className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-100/80 dark:bg-white/[0.02] border border-slate-300 dark:border-white/5 text-slate-800 dark:text-white focus:outline-none focus:border-purple-500/50 placeholder-slate-400 dark:placeholder-gray-500"
                   />
                 </div>
 
-                <div className="flex gap-1 bg-white/[0.01] border border-white/5 rounded-lg p-0.5 text-[10px] font-bold">
+                <div className="flex gap-1 bg-slate-100/80 dark:bg-white/[0.01] border border-slate-300 dark:border-white/5 rounded-lg p-0.5 text-[10px] font-bold">
                   {["ALL", "HIGH", "MEDIUM", "LOW"].map((sev) => (
                     <button
                       key={sev}
                       onClick={() => setRiskSeverityFilter(sev)}
-                      className={`px-3.5 py-1 rounded transition-all
+                      className={`px-3.5 py-1 rounded transition-all cursor-pointer
                         ${riskSeverityFilter === sev 
-                          ? "bg-purple-500/20 text-purple-300 border border-purple-500/30" 
-                          : "text-gray-400 hover:text-white"}`}
+                          ? "bg-purple-100 text-purple-700 border border-purple-200 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-500/30" 
+                          : "text-slate-500 hover:text-slate-805 dark:text-gray-400 dark:hover:text-white"}`}
                     >
                       {sev === "ALL" ? "All" : sev}
                     </button>
@@ -1525,32 +1526,32 @@ export default function ResultCard({
               </div>
 
               {filteredRisks.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 text-center border border-dashed border-white/5 rounded-xl bg-white/[0.01]">
-                  <CheckCircle2 className="w-12 h-12 text-emerald-400 mb-2 animate-bounce" style={{ animationDuration: "4s" }} />
-                  <span className="text-sm font-bold text-white">Full Regulatory Clearance</span>
-                  <p className="text-xs text-gray-500 mt-1 max-w-sm">No regulatory or security compliance violations detected.</p>
+                <div className="flex flex-col items-center justify-center py-16 text-center border border-dashed border-slate-300 dark:border-white/5 rounded-xl bg-slate-50/50 dark:bg-white/[0.01]">
+                  <CheckCircle2 className="w-12 h-12 text-emerald-500 dark:text-emerald-400 mb-2 animate-bounce" style={{ animationDuration: "4s" }} />
+                  <span className="text-sm font-bold text-slate-800 dark:text-white">Full Regulatory Clearance</span>
+                  <p className="text-xs text-slate-500 dark:text-gray-500 mt-1 max-w-sm">No regulatory or security compliance violations detected.</p>
                 </div>
               ) : (
                 filteredRisks.map((risk, index) => {
                   const severity = risk.severity?.toUpperCase() || "LOW";
                   let borderLeftClass = "border-l-blue-500";
-                  let severityBadgeColor = "bg-blue-500/10 text-blue-300 border-blue-500/20";
-                  let riskIconColor = "text-blue-400";
+                  let severityBadgeColor = "bg-blue-55 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-500/20";
+                  let riskIconColor = "text-blue-500 dark:text-blue-400";
                   
                   if (severity === "HIGH") {
                     borderLeftClass = "border-l-rose-500";
-                    severityBadgeColor = "bg-rose-500/10 text-rose-300 border-rose-500/20";
-                    riskIconColor = "text-rose-400";
+                    severityBadgeColor = "bg-rose-50 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-500/20";
+                    riskIconColor = "text-rose-500 dark:text-rose-400";
                   } else if (severity === "MEDIUM") {
                     borderLeftClass = "border-l-amber-500";
-                    severityBadgeColor = "bg-amber-500/10 text-amber-300 border-amber-500/20";
-                    riskIconColor = "text-amber-400";
+                    severityBadgeColor = "bg-amber-50 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-500/20";
+                    riskIconColor = "text-amber-505 dark:text-amber-400";
                   }
 
                   return (
                     <div 
                       key={index}
-                      className={`p-4 rounded-xl border border-white/5 border-l-4 ${borderLeftClass} flex gap-4 transition-all bg-white/[0.005] hover:bg-white/[0.015] shadow-sm`}
+                      className={`p-4 rounded-xl border border-slate-205 dark:border-white/5 border-l-4 ${borderLeftClass} flex gap-4 transition-all bg-slate-50/50 dark:bg-white/[0.005] hover:bg-slate-100/60 dark:hover:bg-white/[0.015] shadow-sm`}
                     >
                       <AlertTriangle className={`w-5 h-5 shrink-0 mt-0.5 ${riskIconColor}`} />
                       <div className="flex-1 flex flex-col justify-between sm:flex-row sm:items-start gap-3">
@@ -1559,18 +1560,18 @@ export default function ResultCard({
                             <span className={`text-[8px] uppercase tracking-widest font-black px-2 py-0.5 rounded border ${severityBadgeColor}`}>
                               {severity} SEVERITY
                             </span>
-                            <span className="text-[10px] text-gray-400 flex items-center gap-1 font-bold bg-white/[0.02] px-2 py-0.5 rounded border border-white/5">
-                              <Clock className="w-3 h-3 text-purple-400" />
+                            <span className="text-[10px] text-slate-600 dark:text-gray-400 flex items-center gap-1 font-bold bg-slate-200/60 dark:bg-white/[0.02] px-2 py-0.5 rounded border border-slate-300 dark:border-white/5">
+                              <Clock className="w-3 h-3 text-purple-650 dark:text-purple-400" />
                               Timestamp: {risk.timestamp || "0:00"}
                             </span>
                           </div>
-                          <p className="text-xs text-slate-205 leading-relaxed font-medium">
+                          <p className="text-xs text-slate-700 dark:text-slate-202 leading-relaxed font-medium">
                             {risk.reason || "Detail not specified."}
                           </p>
                         </div>
                         <button
                           onClick={() => handleJumpToTranscript(risk.timestamp)}
-                          className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/25 text-[10px] font-black text-purple-300 hover:bg-purple-500/20 hover:text-white transition-all self-start shadow-sm cursor-pointer"
+                          className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-100/80 dark:bg-purple-500/10 border border-purple-250 dark:border-purple-500/25 text-[10px] font-black text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-500/20 dark:hover:text-white transition-all self-start shadow-sm cursor-pointer select-none"
                         >
                           Focus Speech <ArrowRight className="w-3.5 h-3.5" />
                         </button>
@@ -1588,13 +1589,13 @@ export default function ResultCard({
               {mode === "normal" ? (
                 /* NORMAL AUDITOR EDITOR manual coaching feedback */
                 <div className="space-y-4">
-                  <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/10 flex items-center gap-3.5 shadow-md">
-                    <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
-                      <Award className="w-5 h-5 text-purple-400 animate-pulse" />
+                  <div className="p-4 rounded-xl bg-purple-50/60 dark:bg-purple-500/5 border border-purple-200 dark:border-purple-500/10 flex items-center gap-3.5 shadow-md">
+                    <div className="w-10 h-10 rounded-xl bg-purple-100/80 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 flex items-center justify-center text-purple-700 dark:text-purple-400 shrink-0">
+                      <Award className="w-5 h-5 text-purple-700 dark:text-purple-400 animate-pulse" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-white uppercase tracking-wider">Manual Coaching Alignment</h4>
-                      <p className="text-[11px] text-gray-400 mt-0.5">Custom training recommendations. Write feedback points (one per line) below.</p>
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">Manual Coaching Alignment</h4>
+                      <p className="text-[11px] text-slate-500 dark:text-gray-400 mt-0.5">Custom training recommendations. Write feedback points (one per line) below.</p>
                     </div>
                   </div>
 
@@ -1603,7 +1604,7 @@ export default function ResultCard({
                     placeholder="Enter professional coaching notes, one per line..."
                     value={manualCoaching}
                     onChange={(e) => setManualCoaching(e.target.value)}
-                    className="w-full p-4 rounded-2xl bg-black/45 border border-white/5 text-xs text-white focus:outline-none focus:border-purple-500/50 transition-all placeholder-gray-500 leading-relaxed font-sans font-medium"
+                    className="w-full p-4 rounded-2xl bg-slate-100/80 dark:bg-black/45 border border-slate-300 dark:border-white/5 text-xs text-slate-800 dark:text-white focus:outline-none focus:border-purple-500/50 transition-all placeholder-slate-400 leading-relaxed font-sans font-medium"
                   />
 
                   <div className="flex justify-end">
@@ -1619,27 +1620,27 @@ export default function ResultCard({
               ) : (
                 /* AI MODE coaching timeline logs */
                 <>
-                  <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/10 flex items-center gap-3.5 shadow-md">
-                    <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
+                  <div className="p-4 rounded-xl bg-purple-50/60 dark:bg-purple-500/5 border border-purple-250 dark:border-purple-500/10 flex items-center gap-3.5 shadow-md">
+                    <div className="w-10 h-10 rounded-xl bg-purple-100/80 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 flex items-center justify-center text-purple-700 dark:text-purple-400 shrink-0">
                       <Award className="w-5 h-5 animate-pulse" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-white uppercase tracking-wider">Representative Alignment Plan</h4>
-                      <p className="text-[11px] text-gray-400 mt-0.5">Custom action items extracted by Google Gemini to elevate call quality scores.</p>
+                      <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">Representative Alignment Plan</h4>
+                      <p className="text-[11px] text-slate-500 dark:text-gray-400 mt-0.5">Custom action items extracted by Google Gemini to elevate call quality scores.</p>
                     </div>
                   </div>
 
                   {coachingFeedback.length === 0 ? (
-                    <div className="text-center py-12 text-gray-500 italic">No specific coaching points extracted.</div>
+                    <div className="text-center py-12 text-slate-500 italic">No specific coaching points extracted.</div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {coachingFeedback.map((point, idx) => (
                         <div 
                           key={idx} 
-                          className="p-4 rounded-xl bg-white/[0.005] border border-white/5 flex gap-3 hover:border-purple-500/20 hover:bg-white/[0.015] transition-all shadow-sm"
+                          className="p-4 rounded-xl bg-slate-50/50 dark:bg-white/[0.005] border border-slate-200 dark:border-white/5 flex gap-3 hover:border-purple-500 dark:hover:border-purple-500/20 hover:bg-slate-100/60 dark:hover:bg-white/[0.015] transition-all shadow-sm"
                         >
-                          <span className="w-6 h-6 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-xs font-black text-purple-300 shrink-0">{idx + 1}</span>
-                          <p className="text-slate-200 text-xs leading-relaxed font-medium">
+                          <span className="w-6 h-6 rounded-lg bg-purple-100/80 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 flex items-center justify-center text-xs font-black text-purple-700 dark:text-purple-300 shrink-0">{idx + 1}</span>
+                          <p className="text-slate-700 dark:text-slate-202 text-xs leading-relaxed font-medium">
                             {point}
                           </p>
                         </div>
@@ -1649,22 +1650,20 @@ export default function ResultCard({
                 </>
               )}
             </div>
-          )}
-
-          {/* TAB: FULL TRANSCRIPT TIMELINE */}
+          )}          {/* TAB: FULL TRANSCRIPT TIMELINE */}
           {activeTab === "transcript" && (
             <div className="space-y-4 animate-fade-in">
               
               {/* Timeline search filter controls */}
-              <div className="flex flex-col sm:flex-row gap-3 items-center justify-between mb-4 p-1.5 bg-white/[0.01] border border-white/5 rounded-xl backdrop-blur-sm">
+              <div className="flex flex-col sm:flex-row gap-3 items-center justify-between mb-4 p-1.5 bg-slate-100/80 dark:bg-white/[0.01] border border-slate-200 dark:border-white/5 rounded-xl backdrop-blur-sm shadow-sm">
                 <div className="relative w-full sm:max-w-xs pl-1">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500" />
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 dark:text-gray-500" />
                   <input
                     type="text"
                     placeholder="Search dialogue words..."
                     value={transcriptSearchTerm}
                     onChange={(e) => setTranscriptSearchTerm(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2 bg-transparent text-xs text-white placeholder-gray-500 focus:outline-none"
+                    className="w-full pl-9 pr-4 py-2 bg-transparent text-xs text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-gray-500 focus:outline-none font-medium"
                   />
                 </div>
 
@@ -1673,10 +1672,10 @@ export default function ResultCard({
                     <button
                       key={spk}
                       onClick={() => setTranscriptSpeakerFilter(spk)}
-                      className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer
+                      className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer border select-none
                         ${transcriptSpeakerFilter === spk 
-                          ? "bg-purple-500/20 text-purple-300 border border-purple-500/30" 
-                          : "text-gray-400 hover:text-white"}`}
+                          ? "bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-500/30" 
+                          : "text-slate-500 dark:text-gray-400 hover:text-slate-800 dark:hover:text-white border-transparent"}`}
                     >
                       {spk === "ALL" ? "All Speakers" : spk === "AGENT" ? "Agent Only" : "Customer Only"}
                     </button>
@@ -1687,10 +1686,10 @@ export default function ResultCard({
               {/* Scrollable Timeline list */}
               <div className="space-y-4 max-h-[480px] overflow-y-auto pr-2 scrollbar-thin scroll-smooth pb-6">
                 {filteredUtterances.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-16 text-center border border-dashed border-white/5 rounded-xl bg-white/[0.01]">
-                    <MessageSquare className="w-12 h-12 text-purple-500/20 mb-2" />
-                    <span className="text-sm font-bold text-white">Dialogue Speech Matches Not Found</span>
-                    <p className="text-xs text-gray-500 mt-1 max-w-sm">No speech bubbles fit your query parameters.</p>
+                  <div className="flex flex-col items-center justify-center py-16 text-center border border-dashed border-slate-200 dark:border-white/5 rounded-xl bg-slate-50/50 dark:bg-white/[0.01]">
+                    <MessageSquare className="w-12 h-12 text-purple-400/50 dark:text-purple-500/20 mb-2" />
+                    <span className="text-sm font-bold text-slate-800 dark:text-white">Dialogue Speech Matches Not Found</span>
+                    <p className="text-xs text-slate-500 dark:text-gray-500 mt-1 max-w-sm">No speech bubbles fit your query parameters.</p>
                   </div>
                 ) : (
                   filteredUtterances.map((utt, index) => {
@@ -1708,44 +1707,44 @@ export default function ResultCard({
                         className={`flex gap-3 max-w-[85%] transition-all duration-500 rounded-2xl relative
                           ${isAgent ? "mr-auto flex-row" : "ml-auto flex-row-reverse"}
                           ${isHighlighted 
-                            ? "ring-2 ring-purple-500/60 bg-purple-500/[0.04] scale-[1.01] p-2.5 -m-2.5 shadow-[0_8px_30px_rgba(168,85,247,0.15)] rounded-2xl animate-pulse" 
+                            ? "ring-2 ring-purple-500/60 bg-purple-50 dark:bg-purple-500/[0.04] scale-[1.01] p-2.5 -m-2.5 shadow-[0_8px_30px_rgba(168,85,247,0.15)] rounded-2xl animate-pulse" 
                             : ""}`}
                       >
                         {/* Avatar */}
                         <div className={`w-9 h-9 rounded-xl shrink-0 flex items-center justify-center text-xs font-black shadow-md border
                           ${isAgent 
-                            ? "bg-purple-500/10 text-purple-300 border-purple-500/25 shadow-purple-500/5" 
-                            : "bg-blue-500/10 text-blue-300 border-blue-500/25 shadow-blue-500/5"}`}
+                            ? "bg-purple-100/80 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-500/25 shadow-purple-500/5" 
+                            : "bg-blue-100/80 dark:bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-500/25 shadow-blue-500/5"}`}
                         >
                           {isAgent ? "AG" : "CU"}
                         </div>
 
                         {/* Speech Bubble Details */}
                         <div className="flex flex-col gap-1 w-full">
-                          <div className={`flex items-center gap-2 text-[9px] font-black text-gray-400
+                          <div className={`flex items-center gap-2 text-[9px] font-black text-slate-450 dark:text-gray-400
                             ${isAgent ? "flex-row" : "flex-row-reverse"}`}
                           >
-                            <span className={`uppercase tracking-widest ${isAgent ? "text-purple-300" : "text-blue-300"}`}>
+                            <span className={`uppercase tracking-widest ${isAgent ? "text-purple-600 dark:text-purple-300" : "text-blue-600 dark:text-blue-300"}`}>
                               {isAgent ? "AGENT" : "CUSTOMER"}
                             </span>
                             <span>•</span>
-                            <span className="flex items-center gap-0.5 bg-white/[0.02] border border-white/5 px-2 py-0.5 rounded font-mono text-[9px]">
-                              <Clock className="w-2.5 h-2.5 text-purple-400" />
+                            <span className="flex items-center gap-0.5 bg-slate-100 dark:bg-white/[0.02] border border-slate-200 dark:border-white/5 px-2 py-0.5 rounded font-mono text-[9px]">
+                              <Clock className="w-2.5 h-2.5 text-purple-500 dark:text-purple-400" />
                               {formatTime(utt.start)} - {formatTime(utt.end)}
                             </span>
                             <span>•</span>
-                            <span className="font-mono text-gray-500">
+                            <span className="font-mono text-slate-500 dark:text-gray-500">
                               {wordsCount} words ({durationSec.toFixed(1)}s)
                             </span>
                           </div>
 
                           <div className={`p-4 rounded-2xl text-[12px] md:text-[13px] leading-relaxed border shadow-md font-medium relative group/bubble
                             ${isAgent 
-                              ? "bg-[#0b0c16]/95 border-purple-500/10 rounded-tl-none text-purple-50/95" 
-                              : "bg-[#090b14]/95 border-blue-500/10 rounded-tr-none text-blue-50/95"}`}
+                              ? "bg-purple-50/95 dark:bg-[#0b0c16]/95 border-purple-100 dark:border-purple-500/10 rounded-tl-none text-purple-950 dark:text-purple-50/95" 
+                              : "bg-blue-50/95 dark:bg-[#090b14]/95 border-blue-100 dark:border-blue-500/10 rounded-tr-none text-blue-950 dark:text-blue-50/95"}`}
                           >
                             {getHighlightedText(utt.text, transcriptSearchTerm)}
-                            <div className="absolute right-3.5 bottom-1 opacity-0 group-hover/bubble:opacity-100 transition-opacity pointer-events-none text-[8.5px] font-bold text-gray-500">
+                            <div className="absolute right-3.5 bottom-1 opacity-0 group-hover/bubble:opacity-100 transition-opacity pointer-events-none text-[8.5px] font-bold text-slate-450 dark:text-gray-500">
                               Pace: {Math.round(wordsCount / (durationSec / 60) || 0)} WPM
                             </div>
                           </div>
@@ -1761,36 +1760,36 @@ export default function ResultCard({
           {/* TAB: REAL-TIME COOPERATIVE ASSIST LOGS */}
           {activeTab === "assist" && mode === "ai" && (
             <div className="space-y-4 animate-fade-in">
-              <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/10 flex items-center gap-3.5 shadow-md">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
-                  <Zap className="w-5 h-5 text-purple-400 animate-pulse" />
+              <div className="p-4 rounded-xl bg-purple-50/60 dark:bg-purple-500/5 border border-purple-250 dark:border-purple-500/10 flex items-center gap-3.5 shadow-md">
+                <div className="w-10 h-10 rounded-xl bg-purple-100/80 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 flex items-center justify-center text-purple-700 dark:text-purple-400 shrink-0">
+                  <Zap className="w-5 h-5 text-purple-700 dark:text-purple-400 animate-pulse" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wider">Live Agent Assist Log Timeline</h4>
-                  <p className="text-[11px] text-gray-400 mt-0.5">Chronologically indexed assist recommendations triggered during the conversation flow.</p>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">Live Agent Assist Log Timeline</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-gray-400 mt-0.5">Chronologically indexed assist recommendations triggered during the conversation flow.</p>
                 </div>
               </div>
 
               {liveAssistLogs.length === 0 ? (
-                <div className="text-center py-12 text-gray-500 italic">No real-time assist recommendations seeded.</div>
+                <div className="text-center py-12 text-slate-500 dark:text-gray-500 italic">No real-time assist recommendations seeded.</div>
               ) : (
                 <div className="space-y-3">
                   {liveAssistLogs.map((log, index) => {
-                    let catColor = "bg-purple-500/10 border-purple-500/20 text-purple-300";
-                    if (log.category === "CRITICAL") catColor = "bg-rose-500/10 border-rose-500/20 text-rose-300";
-                    else if (log.category === "EMOTE") catColor = "bg-blue-500/10 border-blue-500/20 text-blue-300";
+                    let catColor = "bg-purple-100/80 dark:bg-purple-500/10 border-purple-200 dark:border-purple-500/20 text-purple-700 dark:text-purple-350";
+                    if (log.category === "CRITICAL") catColor = "bg-rose-100/80 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/20 text-rose-700 dark:text-rose-350";
+                    else if (log.category === "EMOTE") catColor = "bg-blue-100/80 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/20 text-blue-700 dark:text-blue-350";
                     
                     return (
                       <div 
                         key={index} 
-                        className="p-4 rounded-xl bg-white/[0.005] border border-white/5 flex gap-4 hover:border-purple-500/20 hover:bg-white/[0.015] transition-all shadow-sm items-center justify-between"
+                        className="p-4 rounded-xl bg-slate-50/50 dark:bg-white/[0.005] border border-slate-200 dark:border-white/5 flex gap-4 hover:border-purple-500 dark:hover:border-purple-500/20 hover:bg-slate-100/60 dark:hover:bg-white/[0.015] transition-all shadow-sm items-center justify-between"
                       >
                         <div className="flex gap-3 items-center min-w-0">
-                          <span className="w-6 h-6 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-[10px] font-black text-purple-300 shrink-0 font-mono">
+                          <span className="w-6 h-6 rounded-lg bg-purple-100/80 dark:bg-purple-500/10 border border-purple-200 dark:border-purple-500/20 flex items-center justify-center text-[10px] font-black text-purple-700 dark:text-purple-300 shrink-0 font-mono">
                             {formatTime(log.timestamp)}
                           </span>
                           <div className="min-w-0">
-                            <p className="text-slate-200 text-xs leading-relaxed font-semibold truncate sm:whitespace-normal">
+                            <p className="text-slate-750 dark:text-slate-200 text-xs leading-relaxed font-semibold truncate sm:whitespace-normal">
                               {log.suggestion}
                             </p>
                           </div>
@@ -1802,7 +1801,7 @@ export default function ResultCard({
                           </span>
                           <button
                             onClick={() => handleJumpToTranscript(log.timestamp)}
-                            className="px-2.5 py-1 rounded bg-white/5 border border-white/10 text-[8.5px] font-black text-gray-300 hover:bg-white/10 hover:text-white transition-all select-none cursor-pointer"
+                            className="px-2.5 py-1 rounded bg-slate-100 dark:bg-white/5 border border-slate-300 dark:border-white/10 text-[8.5px] font-black text-slate-700 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white transition-all select-none cursor-pointer"
                           >
                             Jump
                           </button>
@@ -1818,23 +1817,23 @@ export default function ResultCard({
           {/* TAB: AUDITGPT CONVERSATIONAL CHATBOT */}
           {activeTab === "auditgpt" && mode === "ai" && (
             <div className="space-y-4 animate-fade-in flex flex-col h-full min-h-[360px]">
-              <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 flex items-center gap-3.5 shadow-md shrink-0">
-                <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
-                  <Sparkles className="w-5 h-5 text-indigo-400 animate-pulse" />
+              <div className="p-4 rounded-xl bg-indigo-55/60 dark:bg-indigo-500/5 border border-indigo-200 dark:border-indigo-500/10 flex items-center gap-3.5 shadow-md shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-indigo-100/80 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 flex items-center justify-center text-indigo-700 dark:text-indigo-400 shrink-0">
+                  <Sparkles className="w-5 h-5 text-indigo-700 dark:text-indigo-400 animate-pulse" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wider">AuditGPT Interactive Session</h4>
-                  <p className="text-[11px] text-gray-400 mt-0.5">Search or analyze this call, regulatory compliance points, or speaker biometrics in natural language.</p>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">AuditGPT Interactive Session</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-gray-400 mt-0.5">Search or analyze this call, regulatory compliance points, or speaker biometrics in natural language.</p>
                 </div>
               </div>
 
               {/* Chat bubbles area */}
-              <div className="flex-1 overflow-y-auto max-h-[240px] p-3 rounded-2xl bg-black/45 border border-white/5 space-y-3.5 timeline-chat scrollbar-thin shadow-inner">
+              <div className="flex-1 overflow-y-auto max-h-[240px] p-3 rounded-2xl bg-slate-100/80 dark:bg-black/45 border border-slate-250 dark:border-white/5 space-y-3.5 timeline-chat scrollbar-thin shadow-inner">
                 {chatHistory.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full py-10 text-center">
-                    <MessageSquare className="w-10 h-10 text-gray-600 mb-2 animate-bounce" style={{ animationDuration: "3s" }} />
-                    <span className="text-xs font-black text-slate-400">Secure AuditGPT Session Initialised</span>
-                    <p className="text-[10px] text-gray-500 mt-1 max-w-xs">Ask specific queries like: "Did the agent explain contract cancellation fees?" or "Summarize the customer complaints."</p>
+                    <MessageSquare className="w-10 h-10 text-slate-400 dark:text-gray-600 mb-2 animate-bounce" style={{ animationDuration: "3s" }} />
+                    <span className="text-xs font-black text-slate-500 dark:text-slate-400">Secure AuditGPT Session Initialised</span>
+                    <p className="text-[10px] text-slate-400 dark:text-gray-500 mt-1 max-w-xs">Ask specific queries like: "Did the agent explain contract cancellation fees?" or "Summarize the customer complaints."</p>
                   </div>
                 ) : (
                   chatHistory.map((msg, index) => {
@@ -1846,19 +1845,19 @@ export default function ResultCard({
                       >
                         <div className={`w-7 h-7 rounded-lg shrink-0 flex items-center justify-center text-[10px] font-black shadow-md border
                           ${isUser 
-                            ? "bg-purple-500/10 text-purple-300 border-purple-500/25" 
-                            : "bg-indigo-500/10 text-indigo-300 border-indigo-500/25"}`}
+                            ? "bg-purple-100/80 dark:bg-purple-500/10 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-500/25" 
+                            : "bg-indigo-100/80 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-500/25"}`}
                         >
                           {isUser ? "US" : "AI"}
                         </div>
                         <div className="flex flex-col gap-0.5">
-                          <span className={`text-[8px] font-bold text-gray-500 uppercase tracking-widest ${isUser ? "text-right" : ""}`}>
+                          <span className={`text-[8px] font-bold text-slate-500 dark:text-gray-500 uppercase tracking-widest ${isUser ? "text-right" : ""}`}>
                             {isUser ? "Manager" : "AuditGPT Compliance Intelligence"}
                           </span>
                           <div className={`p-3 rounded-xl text-[11px] leading-relaxed border shadow-md font-medium select-text
                             ${isUser 
-                              ? "bg-purple-600/10 border-purple-500/20 text-purple-100 rounded-tr-none" 
-                              : "bg-indigo-950/30 border-indigo-500/15 text-indigo-100 rounded-tl-none"}`}
+                              ? "bg-purple-100/80 dark:bg-purple-600/10 border-purple-200 dark:border-purple-500/20 text-purple-950 dark:text-purple-100 rounded-tr-none" 
+                              : "bg-indigo-55 dark:bg-indigo-950/30 border-indigo-100 dark:border-indigo-500/15 text-indigo-950 dark:text-indigo-100 rounded-tl-none"}`}
                           >
                             <p className="whitespace-pre-wrap">{msg.text}</p>
                           </div>
@@ -1870,11 +1869,11 @@ export default function ResultCard({
                 
                 {sendingChat && (
                   <div className="flex gap-3 max-w-[80%] mr-auto items-center">
-                    <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center text-[10px] font-black border bg-indigo-500/10 text-indigo-300 border-indigo-500/25 animate-pulse">
+                    <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center text-[10px] font-black border bg-indigo-100/80 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-500/25 animate-pulse">
                       AI
                     </div>
-                    <div className="flex items-center gap-1.5 bg-white/5 border border-white/10 px-3.5 py-2 rounded-xl text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-purple-400" />
+                    <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-white/5 border border-slate-300 dark:border-white/10 px-3.5 py-2 rounded-xl text-[10px] text-slate-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-purple-500 dark:text-purple-400" />
                       AuditGPT is analyzing transcript...
                     </div>
                   </div>
@@ -1889,7 +1888,7 @@ export default function ResultCard({
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
                   disabled={sendingChat}
-                  className="flex-1 px-4 py-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500/50 transition-all font-medium"
+                  className="flex-1 px-4 py-2.5 rounded-xl bg-slate-100 dark:bg-white/[0.02] border border-slate-300 dark:border-white/5 text-xs text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-gray-500 focus:outline-none focus:border-indigo-500/50 transition-all font-medium"
                 />
                 <button
                   type="submit"

@@ -14,7 +14,8 @@ export default function Sidebar({
   seedSampleData, seeding,
   playingAudioUrl, setPlayingAudioUrl,
   isPlaying, setIsPlaying, backendUrl,
-  handleRenameAudit, handleDeleteAudit
+  handleRenameAudit, handleDeleteAudit,
+  isDarkMode
 }) {
   const [renamingId, setRenamingId] = useState(null);
   const [renameText, setRenameText] = useState("");
@@ -25,7 +26,7 @@ export default function Sidebar({
         {/* ── HEADER ─────────────────────────────── */}
         <div style={{
           padding: "1.1rem 1.25rem",
-          borderBottom: "1px solid rgba(255,255,255,0.06)",
+          borderBottom: isDarkMode ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(139,92,246,0.12)",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -79,8 +80,8 @@ export default function Sidebar({
           margin: "0.75rem 0.9rem",
           padding: "0.7rem 0.85rem",
           borderRadius: 14,
-          background: "rgba(255,255,255,0.025)",
-          border: "1px solid rgba(255,255,255,0.06)",
+          background: isDarkMode ? "rgba(255,255,255,0.025)" : "rgba(139,92,246,0.03)",
+          border: isDarkMode ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(139,92,246,0.15)",
           display: "flex", alignItems: "center", gap: "0.65rem",
           flexShrink: 0
         }}>
@@ -93,10 +94,10 @@ export default function Sidebar({
             {user?.name?.[0] || "U"}
           </div>
           <div style={{ minWidth: 0, flex: 1 }}>
-            <p style={{ margin: 0, fontSize: 12, fontWeight: 800, color: "#e2e8f0", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            <p style={{ margin: 0, fontSize: 12, fontWeight: 800, color: isDarkMode ? "#e2e8f0" : "#0f172a", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
               {user?.name}
             </p>
-            <p style={{ margin: 0, fontSize: 10, color: "#475569", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            <p style={{ margin: 0, fontSize: 10, color: isDarkMode ? "#475569" : "#64748b", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
               {user?.email}
             </p>
           </div>
@@ -111,9 +112,9 @@ export default function Sidebar({
               borderRadius: 12, fontSize: 12, fontWeight: 800,
               display: "flex", alignItems: "center", justifyContent: "center", gap: "0.45rem",
               cursor: !audit ? "default" : "pointer",
-              border: !audit ? "1px solid rgba(139,92,246,0.4)" : "1px solid rgba(255,255,255,0.08)",
-              background: !audit ? "rgba(139,92,246,0.12)" : "rgba(255,255,255,0.03)",
-              color: !audit ? "#c084fc" : "#94a3b8",
+              border: !audit ? "1px solid rgba(139,92,246,0.4)" : (isDarkMode ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(139,92,246,0.15)"),
+              background: !audit ? "rgba(139,92,246,0.12)" : (isDarkMode ? "rgba(255,255,255,0.03)" : "rgba(139,92,246,0.04)"),
+              color: !audit ? (isDarkMode ? "#c084fc" : "#7c3aed") : (isDarkMode ? "#94a3b8" : "#475569"),
               transition: "all 0.2s ease"
             }}
           >
@@ -125,7 +126,7 @@ export default function Sidebar({
         {/* ── FILTERS SECTION ─────────────────────── */}
         <div style={{
           padding: "0 0.9rem 0.75rem",
-          borderBottom: "1px solid rgba(255,255,255,0.05)",
+          borderBottom: isDarkMode ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(139,92,246,0.12)",
           flexShrink: 0
         }}>
           {/* Title row */}
@@ -143,7 +144,7 @@ export default function Sidebar({
 
           {/* Search */}
           <div style={{ position: "relative", marginBottom: "0.5rem" }}>
-            <Search size={13} style={{ position: "absolute", left: 9, top: "50%", transform: "translateY(-50%)", color: "#475569" }} />
+            <Search size={13} style={{ position: "absolute", left: 9, top: "50%", transform: "translateY(-50%)", color: isDarkMode ? "#475569" : "#94a3b8" }} />
             <input
               type="text"
               placeholder="Search records..."
@@ -152,14 +153,15 @@ export default function Sidebar({
               style={{
                 width: "100%", paddingLeft: 28, paddingRight: 10, paddingTop: 7, paddingBottom: 7,
                 borderRadius: 10, fontSize: 11, fontWeight: 500,
-                background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
-                color: "#e2e8f0", outline: "none", fontFamily: "inherit", boxSizing: "border-box"
+                background: isDarkMode ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.8)",
+                border: isDarkMode ? "1px solid rgba(255,255,255,0.07)" : "1px solid rgba(139,92,246,0.15)",
+                color: isDarkMode ? "#e2e8f0" : "#0f172a", outline: "none", fontFamily: "inherit", boxSizing: "border-box"
               }}
             />
           </div>
 
           {/* Filter pills */}
-          <div style={{ display: "flex", gap: 3, background: "rgba(255,255,255,0.015)", borderRadius: 9, padding: 3, border: "1px solid rgba(255,255,255,0.05)" }}>
+          <div style={{ display: "flex", gap: 3, background: isDarkMode ? "rgba(255,255,255,0.015)" : "rgba(139,92,246,0.02)", borderRadius: 9, padding: 3, border: isDarkMode ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(139,92,246,0.1)" }}>
             {["ALL", "POSITIVE", "NEUTRAL", "NEGATIVE"].map((s) => (
               <button
                 key={s}
@@ -169,7 +171,7 @@ export default function Sidebar({
                   fontSize: 9, fontWeight: 800, textTransform: "uppercase",
                   letterSpacing: "0.05em", cursor: "pointer", border: "none",
                   background: sentimentFilter === s ? "rgba(139,92,246,0.22)" : "transparent",
-                  color: sentimentFilter === s ? "#c084fc" : "#475569",
+                  color: sentimentFilter === s ? (isDarkMode ? "#c084fc" : "#7c3aed") : (isDarkMode ? "#475569" : "#94a3b8"),
                   boxShadow: sentimentFilter === s ? "0 0 8px rgba(139,92,246,0.15)" : "none",
                   transition: "all 0.2s ease"
                 }}
@@ -283,15 +285,15 @@ export default function Sidebar({
                   style={{
                     padding: "0.65rem 0.75rem",
                     borderRadius: 12,
-                    border: `1px solid ${isSelected ? "transparent" : "rgba(255,255,255,0.06)"}`,
-                    background: isSelected ? undefined : "rgba(255,255,255,0.015)",
+                    border: `1px solid ${isSelected ? "transparent" : (isDarkMode ? "rgba(255,255,255,0.06)" : "rgba(139,92,246,0.12)")}`,
+                    background: isSelected ? undefined : (isDarkMode ? "rgba(255,255,255,0.015)" : "rgba(255,255,255,0.6)"),
                     cursor: "pointer",
                     display: "flex", flexDirection: "column", gap: "0.35rem",
                     transition: "all 0.2s ease",
                     flexShrink: 0
                   }}
-                  onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = "rgba(255,255,255,0.04)"; }}
-                  onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = "rgba(255,255,255,0.015)"; }}
+                  onMouseEnter={e => { if (!isSelected) e.currentTarget.style.background = isDarkMode ? "rgba(255,255,255,0.04)" : "rgba(255,255,255,0.85)"; }}
+                  onMouseLeave={e => { if (!isSelected) e.currentTarget.style.background = isDarkMode ? "rgba(255,255,255,0.015)" : "rgba(255,255,255,0.6)"; }}
                 >
                   {/* Filename + sentiment icon */}
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
@@ -368,7 +370,7 @@ export default function Sidebar({
                           <span style={{
                             fontSize: 11,
                             fontWeight: 800,
-                            color: isCurrentItemPlaying ? "#c084fc" : "#cbd5e1",
+                            color: isCurrentItemPlaying ? "#c084fc" : (isDarkMode ? "#cbd5e1" : "#1e293b"),
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             whiteSpace: "nowrap",
@@ -408,13 +410,13 @@ export default function Sidebar({
                   </div>
 
                   {/* Date + Score */}
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "#475569" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: isDarkMode ? "#475569" : "#64748b" }}>
                     <span>{formatDate(item.createdAt)}</span>
                     <span style={{ fontWeight: 700, color: scoreColor }}>{pct}%</span>
                   </div>
 
                   {/* Score bar */}
-                  <div style={{ height: 2, borderRadius: 99, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
+                  <div style={{ height: 2, borderRadius: 99, background: isDarkMode ? "rgba(255,255,255,0.06)" : "rgba(139,92,246,0.12)", overflow: "hidden" }}>
                     <div style={{ height: "100%", width: `${pct}%`, background: scoreColor, borderRadius: 99, transition: "width 0.5s ease" }} />
                   </div>
 
@@ -422,7 +424,7 @@ export default function Sidebar({
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <span className={badgeClass}>{item.sentiment || "Neutral"}</span>
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 9, color: "#334155" }}>
+                      <span style={{ display: "flex", alignItems: "center", gap: 3, fontSize: 9, color: isDarkMode ? "#334155" : "#64748b" }}>
                         <Clock size={9} style={{ color: "#6d28d9" }} />
                         {(() => {
                           const dur = item.duration || (item.utterances && item.utterances.length > 0 ? item.utterances[item.utterances.length - 1].end : 0);
@@ -433,8 +435,8 @@ export default function Sidebar({
                         <button
                           onClick={handlePlaybackToggle}
                           style={{
-                            background: isCurrentItemPlaying ? "rgba(139,92,246,0.2)" : "rgba(255,255,255,0.05)",
-                            border: isCurrentItemPlaying ? "1px solid rgba(139,92,246,0.4)" : "1px solid rgba(255,255,255,0.1)",
+                            background: isCurrentItemPlaying ? "rgba(139,92,246,0.2)" : (isDarkMode ? "rgba(255,255,255,0.05)" : "rgba(139,92,246,0.05)"),
+                            border: isCurrentItemPlaying ? "1px solid rgba(139,92,246,0.4)" : (isDarkMode ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(139,92,246,0.15)"),
                             borderRadius: "50%",
                             width: "18px",
                             height: "18px",
@@ -442,7 +444,7 @@ export default function Sidebar({
                             alignItems: "center",
                             justifyContent: "center",
                             cursor: "pointer",
-                            color: isCurrentItemPlaying ? "#c084fc" : "#94a3b8",
+                            color: isCurrentItemPlaying ? "#c084fc" : (isDarkMode ? "#94a3b8" : "#64748b"),
                             transition: "all 0.2s ease"
                           }}
                           onMouseEnter={(e) => {
@@ -450,8 +452,8 @@ export default function Sidebar({
                             e.currentTarget.style.color = "#ffffff";
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.background = isCurrentItemPlaying ? "rgba(139,92,246,0.2)" : "rgba(255,255,255,0.05)";
-                            e.currentTarget.style.color = isCurrentItemPlaying ? "#c084fc" : "#94a3b8";
+                            e.currentTarget.style.background = isCurrentItemPlaying ? "rgba(139,92,246,0.2)" : (isDarkMode ? "rgba(255,255,255,0.05)" : "rgba(139,92,246,0.05)");
+                            e.currentTarget.style.color = isCurrentItemPlaying ? "#c084fc" : (isDarkMode ? "#94a3b8" : "#64748b");
                           }}
                         >
                           {isCurrentItemPlaying ? (
@@ -472,8 +474,8 @@ export default function Sidebar({
         {/* ── LOGOUT FOOTER ───────────────────────── */}
         <div style={{
           padding: "0.75rem 0.9rem",
-          borderTop: "1px solid rgba(255,255,255,0.05)",
-          background: "rgba(4,6,13,0.7)",
+          borderTop: isDarkMode ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(139,92,246,0.12)",
+          background: isDarkMode ? "rgba(4,6,13,0.7)" : "rgba(241,245,249,0.9)",
           flexShrink: 0
         }}>
           <button

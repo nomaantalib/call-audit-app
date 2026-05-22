@@ -20,9 +20,24 @@ const backendUrl = getBackendUrl();
 
 export default function App() {
   const { user, loading, logout } = useAuth();
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved) return saved === "dark";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
   const [audit, setAudit] = useState(null);
   const [history, setHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [isDarkMode]);
   const [searchQuery, setSearchQuery] = useState("");
   const [sentimentFilter, setSentimentFilter] = useState("ALL");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -138,8 +153,8 @@ export default function App() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: "100vh", background: "#060814", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "1rem" }}>
-        <div style={{ position: "absolute", top: "-10%", left: "10%", width: "50%", height: "50%", background: "rgba(139,92,246,0.08)", borderRadius: "50%", filter: "blur(160px)" }} />
+      <div style={{ minHeight: "100vh", background: isDarkMode ? "#060814" : "#f8fafc", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "1rem", transition: "background-color 0.3s ease" }}>
+        <div style={{ position: "absolute", top: "-10%", left: "10%", width: "50%", height: "50%", background: isDarkMode ? "rgba(139,92,246,0.08)" : "rgba(139,92,246,0.04)", borderRadius: "50%", filter: "blur(160px)" }} />
         <Activity style={{ width: 40, height: 40, color: "#a78bfa", animation: "spin 1s linear infinite" }} />
         <p style={{ fontSize: 12, fontWeight: 700, color: "#7c3aed", textTransform: "uppercase", letterSpacing: "0.1em" }}>
           Initialising Secure Cockpit…
@@ -186,6 +201,8 @@ export default function App() {
         backendUrl={backendUrl}
         handleRenameAudit={handleRenameAudit}
         handleDeleteAudit={handleDeleteAudit}
+        isDarkMode={isDarkMode}
+        setIsDarkMode={setIsDarkMode}
       />
 
       {/* ── STAGE (right panel) ── */}
@@ -193,7 +210,7 @@ export default function App() {
 
         {/* Sticky top header bar */}
         <div className="stage-header">
-          <Header setSidebarOpen={setSidebarOpen} audit={audit} user={user} />
+          <Header setSidebarOpen={setSidebarOpen} audit={audit} user={user} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
         </div>
 
         {/* Scrollable content body */}
@@ -205,18 +222,20 @@ export default function App() {
               totalAudited={totalAudited}
               avgScore={avgScore}
               criticalViolations={criticalViolations}
+              isDarkMode={isDarkMode}
             />
 
             {/* ── MAIN WORKSPACE ── */}
             {!audit ? (
               /* No audit selected → show upload + hero */
               <div className="upload-wrapper animate-fade-in">
-                <HeroBanner />
+                <HeroBanner isDarkMode={isDarkMode} />
                 <UploadForm
                   onResult={handleNewAudit}
                   seedSampleData={seedSampleData}
                   seeding={seeding}
                   hasAudits={history.length > 0}
+                  isDarkMode={isDarkMode}
                 />
               </div>
             ) : (
@@ -303,6 +322,7 @@ export default function App() {
                   backendUrl={backendUrl}
                   handleRenameAudit={handleRenameAudit}
                   handleDeleteAudit={handleDeleteAudit}
+                  isDarkMode={isDarkMode}
                 />
               </div>
             )}
