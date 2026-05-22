@@ -6,7 +6,7 @@ import {
   Award, ChevronDown, ChevronUp, Clock, User, ClipboardList, 
   Info, Search, Mic, ArrowRight, Activity, Zap, Play, Pause, Volume2, Music,
   Send, RefreshCw, Cpu, Database, ShieldCheck, UserCheck, Eye, EyeOff,
-  Edit2, Trash2, Check, X
+  Edit2, Trash2, Check, X, BarChart3, PieChart, TrendingUp
 } from "lucide-react";
 
 export default function ResultCard({ 
@@ -439,6 +439,15 @@ export default function ResultCard({
   const failedCount = totalRules - passedCount;
 
   const isCurrentAudioPlaying = playingAudioUrl === audit.audioUrl && isPlaying;
+
+  // Sentiment Analytics Calculations
+  const posTurns = utterances.filter(u => u.sentiment?.toLowerCase().includes("pos")).length;
+  const negTurns = utterances.filter(u => u.sentiment?.toLowerCase().includes("neg")).length;
+  const neuTurns = utterances.length - posTurns - negTurns;
+  const totalTurns = utterances.length || 1;
+  const posPct = Math.round((posTurns / totalTurns) * 100);
+  const negPct = Math.round((negTurns / totalTurns) * 100);
+  const neuPct = 100 - posPct - negPct;
 
   return (
     <div className="w-full max-w-4xl mx-auto mt-2 animate-fade-in relative select-none">
@@ -1095,6 +1104,22 @@ export default function ResultCard({
           
           {mode === "ai" && (
             <button
+              onClick={() => setActiveTab("analytics")}
+              className={`px-4 py-2 text-[11px] font-black uppercase tracking-wider rounded-xl transition-all duration-300 flex items-center gap-2 cursor-pointer
+                ${activeTab === "analytics"
+                  ? "bg-purple-600/20 text-purple-400 border border-purple-500/35 shadow-[0_0_12px_rgba(139,92,246,0.25)]"
+                  : "border border-transparent text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]"}`}
+            >
+              <BarChart3 className="w-3.5 h-3.5" />
+              <span>Analytics</span>
+              <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black ${activeTab === "analytics" ? "bg-purple-500/35 text-purple-200" : "bg-white/5 text-slate-400"}`}>
+                <TrendingUp className="w-2 h-2" />
+              </span>
+            </button>
+          )}
+          
+          {mode === "ai" && (
+            <button
               onClick={() => setActiveTab("risks")}
               className={`px-4 py-2 text-[11px] font-black uppercase tracking-wider rounded-xl transition-all duration-300 flex items-center gap-2 cursor-pointer
                 ${activeTab === "risks"
@@ -1172,6 +1197,71 @@ export default function ResultCard({
 
         {/* TAB CONTENTS */}
         <div className="min-h-[280px]">
+          
+          {/* TAB: GRAPHS & ANALYTICS */}
+          {activeTab === "analytics" && mode === "ai" && (
+            <div className="space-y-6 animate-fade-in">
+              {/* Row 1: Tone/Sentiment Segment Bar */}
+              <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-sm relative overflow-hidden shadow-inner">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-[10px] font-black uppercase text-pink-400 tracking-widest flex items-center gap-1.5">
+                    <PieChart className="w-3.5 h-3.5 text-pink-400" /> Utterance Sentiment Distribution
+                  </h4>
+                  <span className="text-[8px] uppercase tracking-widest font-black text-gray-500">
+                    {totalTurns} Total Turns
+                  </span>
+                </div>
+                <div className="w-full h-3 bg-white/5 rounded-full overflow-hidden flex shadow-inner">
+                  <div className="h-full bg-gradient-to-r from-emerald-600 to-emerald-400 border-r border-emerald-800" style={{ width: `${posPct}%` }} title={`Positive: ${posPct}%`} />
+                  <div className="h-full bg-gradient-to-r from-blue-600 to-blue-400 border-r border-blue-800" style={{ width: `${neuPct}%` }} title={`Neutral: ${neuPct}%`} />
+                  <div className="h-full bg-gradient-to-r from-rose-600 to-rose-400" style={{ width: `${negPct}%` }} title={`Negative: ${negPct}%`} />
+                </div>
+                <div className="flex items-center justify-between mt-3 px-1">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
+                    <span className="text-[10px] font-black text-slate-300">Positive: <span className="text-emerald-400">{posPct}%</span></span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]"></div>
+                    <span className="text-[10px] font-black text-slate-300">Neutral: <span className="text-blue-400">{neuPct}%</span></span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.8)]"></div>
+                    <span className="text-[10px] font-black text-slate-300">Negative: <span className="text-rose-400">{negPct}%</span></span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 2: Topics and Keywords Cloud */}
+              <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-sm relative shadow-inner">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-[10px] font-black uppercase text-indigo-400 tracking-widest flex items-center gap-1.5">
+                    <Info className="w-3.5 h-3.5 text-indigo-400" /> Topics & Keywords Cloud
+                  </h4>
+                </div>
+                <div className="mb-4">
+                  <h5 className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-2">Key Topics</h5>
+                  <div className="flex flex-wrap gap-2">
+                    {(topicsAndKeywords.topics || []).map((topic, i) => (
+                      <span key={`t-${i}`} className="px-2.5 py-1 rounded-lg text-xs font-black bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 shadow-sm">
+                        {topic}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <h5 className="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-2">Detected Keywords</h5>
+                  <div className="flex flex-wrap gap-2">
+                    {(topicsAndKeywords.keywords || []).map((kw, i) => (
+                      <span key={`k-${i}`} className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-white/5 border border-white/10 text-gray-400 hover:text-white transition-colors cursor-default">
+                        {kw}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           
           {/* TAB: RULES CHECKLIST */}
           {activeTab === "checklist" && (
