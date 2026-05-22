@@ -532,7 +532,7 @@ export default function ResultCard({
                       setEditedName(audit.filename);
                       setIsEditingName(true);
                     }}
-                    className="p-1.5 bg-white/5 hover:bg-purple-650 border border-white/5 hover:border-purple-500/40 rounded-lg text-slate-400 hover:text-white cursor-pointer transition-all"
+                    className="p-1.5 bg-white/5 hover:bg-purple-600 border border-white/5 hover:border-purple-500/40 rounded-lg text-slate-400 hover:text-white cursor-pointer transition-all"
                     title="Rename call file"
                   >
                     <Edit2 size={12} />
@@ -561,7 +561,7 @@ export default function ResultCard({
                 }}
                 className={`px-3.5 py-1.5 rounded-full font-black uppercase tracking-wider transition-all duration-300 cursor-pointer ${
                   mode === "normal"
-                    ? "bg-purple-650 border border-purple-500 text-white shadow-[0_0_12px_rgba(168,85,247,0.3)]"
+                    ? "bg-purple-600 border border-purple-500 text-white shadow-[0_0_12px_rgba(168,85,247,0.3)]"
                     : "text-gray-400 hover:text-white"
                 }`}
               >
@@ -667,7 +667,7 @@ export default function ResultCard({
           <div className="mb-4 p-3 rounded-xl bg-purple-950/70 border border-purple-500/30 text-white flex items-center gap-3 animate-fade-in shadow-[0_0_20px_rgba(168,85,247,0.25)] relative overflow-hidden backdrop-blur-md">
             <span className="absolute -inset-1 bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-transparent pointer-events-none" />
             <div className="w-7 h-7 rounded-lg bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-300 shrink-0">
-              <Zap className="w-4 h-4 text-purple-350 animate-bounce" />
+              <Zap className="w-4 h-4 text-purple-300 animate-bounce" />
             </div>
             <div className="flex-1 min-w-0">
               <span className="text-[8.5px] font-black text-purple-400 uppercase tracking-widest block">
@@ -756,11 +756,11 @@ export default function ResultCard({
 
               <div className="grid grid-cols-2 gap-4 mt-2.5 pt-2 border-t border-white/[0.04]">
                 <div className="text-left">
-                  <span className="text-[9px] text-gray-550 block font-bold uppercase tracking-widest">Agent Pace</span>
+                  <span className="text-[9px] text-gray-500 block font-bold uppercase tracking-widest">Agent Pace</span>
                   <span className="text-xs font-black text-purple-300">{agentWpm} WPM <span className="text-[9px] font-bold text-gray-500">Avg</span></span>
                 </div>
                 <div className="text-right">
-                  <span className="text-[9px] text-gray-555 block font-bold uppercase tracking-widest">Customer Pace</span>
+                  <span className="text-[9px] text-gray-500 block font-bold uppercase tracking-widest">Customer Pace</span>
                   <span className="text-xs font-black text-blue-300">{customerWpm} WPM <span className="text-[9px] font-bold text-gray-500">Avg</span></span>
                 </div>
               </div>
@@ -790,7 +790,7 @@ export default function ResultCard({
                   <div className="relative w-16 h-16 mb-1">
                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                       <circle className="text-white/5 stroke-current" strokeWidth="8" cx="50" cy="50" r="38" fill="transparent" />
-                      <circle className="text-emerald-550 stroke-current" strokeWidth="8" strokeDasharray={2 * Math.PI * 38} strokeDashoffset={2 * Math.PI * 38 - (agentMetrics.empathyScore / 100) * 2 * Math.PI * 38} cx="50" cy="50" r="38" fill="transparent" strokeLinecap="round" />
+                      <circle className="text-emerald-500 stroke-current" strokeWidth="8" strokeDasharray={2 * Math.PI * 38} strokeDashoffset={2 * Math.PI * 38 - (agentMetrics.empathyScore / 100) * 2 * Math.PI * 38} cx="50" cy="50" r="38" fill="transparent" strokeLinecap="round" />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center text-xs font-black text-emerald-400">{agentMetrics.empathyScore}%</div>
                   </div>
@@ -802,7 +802,7 @@ export default function ResultCard({
                   <div className="relative w-16 h-16 mb-1">
                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                       <circle className="text-white/5 stroke-current" strokeWidth="8" cx="50" cy="50" r="38" fill="transparent" />
-                      <circle className="text-blue-550 stroke-current" strokeWidth="8" strokeDasharray={2 * Math.PI * 38} strokeDashoffset={2 * Math.PI * 38 - (agentMetrics.confidenceScore / 100) * 2 * Math.PI * 38} cx="50" cy="50" r="38" fill="transparent" strokeLinecap="round" />
+                      <circle className="text-blue-500 stroke-current" strokeWidth="8" strokeDasharray={2 * Math.PI * 38} strokeDashoffset={2 * Math.PI * 38 - (agentMetrics.confidenceScore / 100) * 2 * Math.PI * 38} cx="50" cy="50" r="38" fill="transparent" strokeLinecap="round" />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center text-xs font-black text-blue-400">{agentMetrics.confidenceScore}%</div>
                   </div>
@@ -814,7 +814,7 @@ export default function ResultCard({
                   <div className="relative w-16 h-16 mb-1">
                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                       <circle className="text-white/5 stroke-current" strokeWidth="8" cx="50" cy="50" r="38" fill="transparent" />
-                      <circle className="text-purple-550 stroke-current" strokeWidth="8" strokeDasharray={2 * Math.PI * 38} strokeDashoffset={2 * Math.PI * 38 - (agentMetrics.talkRatio / 100) * 2 * Math.PI * 38} cx="50" cy="50" r="38" fill="transparent" strokeLinecap="round" />
+                      <circle className="text-purple-500 stroke-current" strokeWidth="8" strokeDasharray={2 * Math.PI * 38} strokeDashoffset={2 * Math.PI * 38 - (agentMetrics.talkRatio / 100) * 2 * Math.PI * 38} cx="50" cy="50" r="38" fill="transparent" strokeLinecap="round" />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center text-xs font-black text-purple-400">{agentMetrics.talkRatio}%</div>
                   </div>
@@ -826,7 +826,7 @@ export default function ResultCard({
                   <div className="relative w-16 h-16 mb-1">
                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                       <circle className="text-white/5 stroke-current" strokeWidth="8" cx="50" cy="50" r="38" fill="transparent" />
-                      <circle className="text-rose-550 stroke-current" strokeWidth="8" strokeDasharray={2 * Math.PI * 38} strokeDashoffset={2 * Math.PI * 38 - (agentMetrics.deadAirPct / 100) * 2 * Math.PI * 38} cx="50" cy="50" r="38" fill="transparent" strokeLinecap="round" />
+                      <circle className="text-rose-500 stroke-current" strokeWidth="8" strokeDasharray={2 * Math.PI * 38} strokeDashoffset={2 * Math.PI * 38 - (agentMetrics.deadAirPct / 100) * 2 * Math.PI * 38} cx="50" cy="50" r="38" fill="transparent" strokeLinecap="round" />
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center text-xs font-black text-rose-400">{agentMetrics.deadAirPct}%</div>
                   </div>
@@ -840,10 +840,10 @@ export default function ResultCard({
               <div className="absolute -top-1 -right-2 text-white/5 font-black text-5xl pointer-events-none select-none tracking-tighter uppercase">RISK</div>
               
               <div className="flex items-center justify-between mb-4">
-                <h4 className="text-[10px] font-black uppercase text-rose-450 tracking-widest flex items-center gap-1.5">
+                <h4 className="text-[10px] font-black uppercase text-rose-400 tracking-widest flex items-center gap-1.5">
                   <AlertTriangle className="w-3.5 h-3.5 text-rose-400" /> Predictive Risk
                 </h4>
-                <span className="text-[8px] uppercase tracking-widest font-black px-1.5 py-0.5 rounded border border-rose-500/20 bg-rose-500/10 text-rose-305 animate-pulse">
+                <span className="text-[8px] uppercase tracking-widest font-black px-1.5 py-0.5 rounded border border-rose-500/20 bg-rose-500/10 text-rose-300 animate-pulse">
                   ALERTS
                 </span>
               </div>
@@ -902,7 +902,7 @@ export default function ResultCard({
               <div className="absolute -top-1 -right-2 text-white/5 font-black text-5xl pointer-events-none select-none tracking-tighter uppercase">BIO</div>
               
               <div className="flex items-center justify-between mb-3">
-                <h4 className="text-[10px] font-black uppercase text-blue-405 tracking-widest flex items-center gap-1.5">
+                <h4 className="text-[10px] font-black uppercase text-blue-400 tracking-widest flex items-center gap-1.5">
                   <ShieldCheck className="w-3.5 h-3.5 text-blue-400" /> Voice Biometrics
                 </h4>
                 <span className="text-[8px] uppercase tracking-widest font-black px-1.5 py-0.5 rounded border border-blue-500/20 bg-blue-500/10 text-blue-300">
@@ -918,7 +918,7 @@ export default function ResultCard({
                 <div className="min-w-0">
                   <span className="text-[9px] text-gray-500 block uppercase font-bold tracking-wider">Verified Agent Signature</span>
                   <span className="text-xs font-black text-slate-200 truncate block">{voiceBiometrics.verifiedSpeaker}</span>
-                  <span className="text-[8px] font-mono text-blue-405">Accuracy: {voiceBiometrics.matchScore}%</span>
+                  <span className="text-[8px] font-mono text-blue-400">Accuracy: {voiceBiometrics.matchScore}%</span>
                 </div>
               </div>
 
@@ -944,7 +944,7 @@ export default function ResultCard({
                           }`}
                       >
                         <span className="truncate">{crm}</span>
-                        <span className="text-[6.5px] text-gray-550 font-bold block uppercase tracking-widest">
+                        <span className="text-[6.5px] text-gray-500 font-bold block uppercase tracking-widest">
                           {isSynced ? "Synced" : isSyncing ? "Wait" : "Sync"}
                         </span>
                       </button>
@@ -964,7 +964,7 @@ export default function ResultCard({
               <h4 className="text-[10px] font-black uppercase text-indigo-400 tracking-widest flex items-center gap-1.5">
                 <Activity className="w-3.5 h-3.5 text-indigo-400" /> Emotional Sentiment Bezier Trajectory
               </h4>
-              <span className="text-[8px] text-gray-550 font-bold uppercase tracking-wider">
+              <span className="text-[8px] text-gray-500 font-bold uppercase tracking-wider">
                 Turn-by-Turn Sentiment Wave
               </span>
             </div>
@@ -1077,7 +1077,7 @@ export default function ResultCard({
             <h4 className="text-[10px] font-black uppercase text-purple-400 tracking-wider mb-2 flex items-center gap-1.5">
               <Target className="w-3.5 h-3.5 text-purple-400" /> Call Objective
             </h4>
-            <p className="text-slate-350 text-xs leading-relaxed font-medium">
+            <p className="text-slate-300 text-xs leading-relaxed font-medium">
               {audit.objective || "No explicit objective extracted."}
             </p>
           </div>
@@ -1085,7 +1085,7 @@ export default function ResultCard({
             <h4 className="text-[10px] font-black uppercase text-pink-400 tracking-wider mb-2 flex items-center gap-1.5">
               <FileText className="w-3.5 h-3.5 text-pink-400" /> Executive Summary
             </h4>
-            <p className="text-slate-350 text-xs leading-relaxed font-medium">
+            <p className="text-slate-300 text-xs leading-relaxed font-medium">
               {audit.conclusion || "No conclusion provided."}
             </p>
           </div>
@@ -1325,7 +1325,7 @@ export default function ResultCard({
                               <span className="text-[9px] uppercase tracking-widest font-black px-1.5 py-0.5 rounded border border-purple-500/20 bg-purple-500/10 text-purple-300">
                                 Weight: {rule.weight}
                               </span>
-                              <span className={`text-[8px] uppercase tracking-widest font-black px-1.5 py-0.5 rounded border ${rule.severity === "HIGH" ? "bg-rose-500/10 border-rose-500/20 text-rose-350" : "bg-blue-500/10 border-blue-500/20 text-blue-300"}`}>
+                              <span className={`text-[8px] uppercase tracking-widest font-black px-1.5 py-0.5 rounded border ${rule.severity === "HIGH" ? "bg-rose-500/10 border-rose-500/20 text-rose-300" : "bg-blue-500/10 border-blue-500/20 text-blue-300"}`}>
                                 Severity: {rule.severity}
                               </span>
                             </div>
@@ -1398,7 +1398,7 @@ export default function ResultCard({
                       
                       if (weight >= 20) {
                         classificationLabel = "CRITICAL COMPLIANCE";
-                        classBadgeClass = "bg-rose-500/10 text-rose-350 border-rose-500/20 animate-pulse";
+                        classBadgeClass = "bg-rose-500/10 text-rose-300 border-rose-500/20 animate-pulse";
                       } else if (weight < 10) {
                         classificationLabel = "Supporting Guideline";
                         classBadgeClass = "bg-blue-500/10 text-blue-300 border-blue-500/20";
@@ -1519,12 +1519,12 @@ export default function ResultCard({
                   
                   if (severity === "HIGH") {
                     borderLeftClass = "border-l-rose-500";
-                    severityBadgeColor = "bg-rose-500/10 text-rose-350 border-rose-500/20";
-                    riskIconColor = "text-rose-450";
+                    severityBadgeColor = "bg-rose-500/10 text-rose-300 border-rose-500/20";
+                    riskIconColor = "text-rose-400";
                   } else if (severity === "MEDIUM") {
                     borderLeftClass = "border-l-amber-500";
-                    severityBadgeColor = "bg-amber-500/10 text-amber-350 border-amber-500/20";
-                    riskIconColor = "text-amber-450";
+                    severityBadgeColor = "bg-amber-500/10 text-amber-300 border-amber-500/20";
+                    riskIconColor = "text-amber-400";
                   }
 
                   return (
@@ -1570,7 +1570,7 @@ export default function ResultCard({
                 <div className="space-y-4">
                   <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/10 flex items-center gap-3.5 shadow-md">
                     <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
-                      <Award className="w-5 h-5 text-purple-450 animate-pulse" />
+                      <Award className="w-5 h-5 text-purple-400 animate-pulse" />
                     </div>
                     <div>
                       <h4 className="text-xs font-bold text-white uppercase tracking-wider">Manual Coaching Alignment</h4>
@@ -1705,7 +1705,7 @@ export default function ResultCard({
                           <div className={`flex items-center gap-2 text-[9px] font-black text-gray-400
                             ${isAgent ? "flex-row" : "flex-row-reverse"}`}
                           >
-                            <span className={`uppercase tracking-widest ${isAgent ? "text-purple-300" : "text-blue-305"}`}>
+                            <span className={`uppercase tracking-widest ${isAgent ? "text-purple-300" : "text-blue-300"}`}>
                               {isAgent ? "AGENT" : "CUSTOMER"}
                             </span>
                             <span>•</span>
@@ -1757,7 +1757,7 @@ export default function ResultCard({
                 <div className="space-y-3">
                   {liveAssistLogs.map((log, index) => {
                     let catColor = "bg-purple-500/10 border-purple-500/20 text-purple-300";
-                    if (log.category === "CRITICAL") catColor = "bg-rose-500/10 border-rose-500/20 text-rose-350";
+                    if (log.category === "CRITICAL") catColor = "bg-rose-500/10 border-rose-500/20 text-rose-300";
                     else if (log.category === "EMOTE") catColor = "bg-blue-500/10 border-blue-500/20 text-blue-300";
                     
                     return (
@@ -1874,7 +1874,7 @@ export default function ResultCard({
                 <button
                   type="submit"
                   disabled={sendingChat || !chatInput.trim()}
-                  className="px-4 py-2.5 rounded-xl bg-indigo-650 border border-indigo-550 hover:bg-indigo-700 text-white font-black text-xs hover:shadow-[0_0_15px_rgba(99,102,241,0.4)] disabled:opacity-40 transition-all shrink-0 flex items-center justify-center gap-1 cursor-pointer select-none"
+                  className="px-4 py-2.5 rounded-xl bg-indigo-600 border border-indigo-500 hover:bg-indigo-700 text-white font-black text-xs hover:shadow-[0_0_15px_rgba(99,102,241,0.4)] disabled:opacity-40 transition-all shrink-0 flex items-center justify-center gap-1 cursor-pointer select-none"
                 >
                   <Send className="w-3.5 h-3.5" />
                   Send
