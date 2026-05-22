@@ -258,16 +258,20 @@ export default function ResultCard({
   // Sentiment Styles
   let SentimentIcon = Meh;
   let sentimentBadgeClass = "bg-blue-500/10 text-blue-300 border-blue-500/20 shadow-[0_0_12px_rgba(59,130,246,0.1)]";
-  let glowColorClass = "from-blue-600/10 via-indigo-600/5 to-transparent";
+  let glowColorClass = "from-blue-600/60 via-purple-600/30 to-transparent";
 
   if (isPositive) {
     SentimentIcon = Smile;
     sentimentBadgeClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_12px_rgba(16,185,129,0.1)]";
-    glowColorClass = "from-emerald-600/10 via-teal-600/5 to-transparent";
   } else if (isNegative) {
     SentimentIcon = Frown;
     sentimentBadgeClass = "bg-rose-500/10 text-rose-400 border-rose-500/20 shadow-[0_0_12px_rgba(244,63,94,0.1)]";
-    glowColorClass = "from-rose-600/10 via-pink-600/5 to-transparent";
+  }
+  
+  if (audit.score >= 85) {
+    glowColorClass = "from-emerald-500/60 via-teal-500/30 to-transparent";
+  } else if (audit.score < 70) {
+    glowColorClass = "from-rose-600/60 via-red-500/30 to-transparent";
   }
 
   const score = audit.score ?? 0;
@@ -452,7 +456,7 @@ export default function ResultCard({
   return (
     <div className="w-full max-w-4xl mx-auto mt-2 animate-fade-in relative select-none">
       {/* Ambient Sentiment Glow Backdrop */}
-      <div className={`absolute -inset-1 rounded-[2.5rem] bg-gradient-to-tr ${glowColorClass} opacity-40 blur-3xl pointer-events-none`}></div>
+      <div className={`absolute -inset-2 rounded-[2.5rem] bg-gradient-to-tr ${glowColorClass} blur-3xl pointer-events-none opacity-80`}></div>
 
       {/* Hidden local audio element */}
       {audit.audioUrl && (
@@ -464,7 +468,8 @@ export default function ResultCard({
         />
       )}
 
-      <div className="glass p-6 md:p-8 rounded-[2rem] relative overflow-hidden border border-white/10 shadow-[0_24px_80px_rgba(0,0,0,0.7)] bg-[#0d1326]/40 backdrop-blur-3xl">
+      {/* Main Glassmorphic Wrapper */}
+      <div className="p-6 md:p-8 rounded-[2rem] relative overflow-hidden bg-[#0d1326]/60 backdrop-blur-2xl border-t border-l border-white/20 border-b border-r border-white/5 shadow-[0_24px_80px_rgba(0,0,0,0.8),inset_0_1px_1px_rgba(255,255,255,0.15)] ring-1 ring-white/10 z-10">
         
         {/* Header Row */}
         <header className="mb-6 border-b border-white/5 pb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
