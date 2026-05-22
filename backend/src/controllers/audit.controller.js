@@ -486,3 +486,43 @@ export const updateRules = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
+// 4. Individual Audit Rename
+export const renameAudit = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { filename } = req.body;
+    if (!filename || filename.trim() === "") {
+      return res.status(400).json({ success: false, error: "Filename is required" });
+    }
+
+    const audit = await Audit.findOne({ _id: id, user: req.user.id });
+    if (!audit) {
+      return res.status(404).json({ success: false, error: "Audit not found" });
+    }
+
+    audit.filename = filename.trim();
+    await audit.save();
+
+    res.json({ success: true, message: "Audit renamed successfully", audit });
+  } catch (error) {
+    console.error("Rename Audit Error:", error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+// 5. Delete Audit from History
+export const deleteAudit = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const audit = await Audit.findOneAndDelete({ _id: id, user: req.user.id });
+    if (!audit) {
+      return res.status(404).json({ success: false, error: "Audit not found" });
+    }
+
+    res.json({ success: true, message: "Audit deleted successfully" });
+  } catch (error) {
+    console.error("Delete Audit Error:", error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};

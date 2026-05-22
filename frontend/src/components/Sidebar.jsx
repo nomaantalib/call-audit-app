@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { 
-  Headphones, X, Award, History, Search, Clock, LogOut, Sparkles, ArrowRight, Play, Pause
+  Headphones, X, Award, History, Search, Clock, LogOut, Sparkles, ArrowRight, Play, Pause,
+  Edit2, Trash2, Check
 } from "lucide-react";
 
 export default function Sidebar({
@@ -11,8 +13,11 @@ export default function Sidebar({
   formatDate, getSentimentIcon,
   seedSampleData, seeding,
   playingAudioUrl, setPlayingAudioUrl,
-  isPlaying, setIsPlaying, backendUrl
+  isPlaying, setIsPlaying, backendUrl,
+  handleRenameAudit, handleDeleteAudit
 }) {
+  const [renamingId, setRenamingId] = useState(null);
+  const [renameText, setRenameText] = useState("");
   return (
     <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
       <div className="sidebar-inner">
@@ -307,19 +312,99 @@ export default function Sidebar({
                           ))}
                         </div>
                       )}
-                      <span style={{
-                        fontSize: 11,
-                        fontWeight: 800,
-                        color: isCurrentItemPlaying ? "#c084fc" : "#cbd5e1",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        flex: 1
-                      }}>
-                        {item.filename}
-                      </span>
+                      
+                      {renamingId === item._id ? (
+                        <div style={{ display: "flex", alignItems: "center", gap: 3, flex: 1 }} onClick={e => e.stopPropagation()}>
+                          <input
+                            type="text"
+                            value={renameText}
+                            onChange={(e) => setRenameText(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                if (renameText.trim() !== "" && renameText.trim() !== item.filename) {
+                                  handleRenameAudit(item._id, renameText.trim());
+                                }
+                                setRenamingId(null);
+                              }
+                              if (e.key === "Escape") setRenamingId(null);
+                            }}
+                            autoFocus
+                            style={{
+                              flex: 1,
+                              fontSize: 10,
+                              fontWeight: 700,
+                              background: "rgba(0,0,0,0.6)",
+                              border: "1px solid rgba(139,92,246,0.6)",
+                              borderRadius: 6,
+                              color: "white",
+                              padding: "2px 6px",
+                              outline: "none"
+                            }}
+                          />
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (renameText.trim() !== "" && renameText.trim() !== item.filename) {
+                                handleRenameAudit(item._id, renameText.trim());
+                              }
+                              setRenamingId(null);
+                            }} 
+                            style={{ background: "none", border: "none", cursor: "pointer", color: "#4ade80", display: "flex", padding: 2 }}
+                          >
+                            <Check size={11} />
+                          </button>
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setRenamingId(null);
+                            }} 
+                            style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171", display: "flex", padding: 2 }}
+                          >
+                            <X size={11} />
+                          </button>
+                        </div>
+                      ) : (
+                        <div style={{ display: "flex", alignItems: "center", gap: 4, flex: 1, minWidth: 0 }} className="group/filename">
+                          <span style={{
+                            fontSize: 11,
+                            fontWeight: 800,
+                            color: isCurrentItemPlaying ? "#c084fc" : "#cbd5e1",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            flex: 1
+                          }}>
+                            {item.filename}
+                          </span>
+                          
+                          {/* Hover action icons */}
+                          <div className="sidebar-item-actions flex items-center gap-1 opacity-0 group-hover/filename:opacity-100 transition-opacity duration-200">
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setRenamingId(item._id);
+                                setRenameText(item.filename);
+                              }} 
+                              style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", padding: 2, display: "flex", alignItems: "center" }} 
+                              title="Rename call file"
+                            >
+                              <Edit2 size={10} className="hover:text-purple-400 transition-colors" />
+                            </button>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteAudit(item._id);
+                              }} 
+                              style={{ background: "none", border: "none", cursor: "pointer", color: "#64748b", padding: 2, display: "flex", alignItems: "center" }} 
+                              title="Delete audit record"
+                            >
+                              <Trash2 size={10} className="hover:text-rose-400 transition-colors" />
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    {getSentimentIcon(item.sentiment)}
+                    {renamingId !== item._id && getSentimentIcon(item.sentiment)}
                   </div>
 
                   {/* Date + Score */}

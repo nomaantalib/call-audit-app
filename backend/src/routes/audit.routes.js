@@ -7,7 +7,9 @@ import {
   overrideAudit, 
   chatWithAudit, 
   getRules, 
-  updateRules 
+  updateRules,
+  renameAudit,
+  deleteAudit
 } from "../controllers/audit.controller.js";
 import { protect } from "../middleware/auth.middleware.js";
 
@@ -23,6 +25,8 @@ router.post("/seed", seedAudits);
 // --- SaaS Enterprise Core Routes ---
 router.post("/:id/override", overrideAudit);
 router.post("/:id/chat", chatWithAudit);
+router.patch("/:id/rename", renameAudit);
+router.delete("/:id", deleteAudit);
 router.get("/rules", getRules);
 router.post("/rules", updateRules);
 

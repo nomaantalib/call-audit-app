@@ -5,7 +5,8 @@ import {
   CheckCircle2, XCircle, AlertTriangle, MessageSquare, 
   Award, ChevronDown, ChevronUp, Clock, User, ClipboardList, 
   Info, Search, Mic, ArrowRight, Activity, Zap, Play, Pause, Volume2, Music,
-  Send, RefreshCw, Cpu, Database, ShieldCheck, UserCheck, Eye, EyeOff
+  Send, RefreshCw, Cpu, Database, ShieldCheck, UserCheck, Eye, EyeOff,
+  Edit2, Trash2, Check, X
 } from "lucide-react";
 
 export default function ResultCard({ 
@@ -14,12 +15,23 @@ export default function ResultCard({
   setPlayingAudioUrl, 
   isPlaying, 
   setIsPlaying, 
-  backendUrl 
+  backendUrl,
+  handleRenameAudit,
+  handleDeleteAudit
 }) {
   const [mode, setMode] = useState(audit?.mode || "ai");
   const [activeTab, setActiveTab] = useState("checklist");
   const [expandedRule, setExpandedRule] = useState(null);
   
+  // Rename States
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState(audit?.filename || "");
+
+  useEffect(() => {
+    setEditedName(audit?.filename || "");
+    setIsEditingName(false);
+  }, [audit]);
+
   // Rules Filtering States
   const [ruleFilter, setRuleFilter] = useState("ALL");
   const [ruleSearch, setRuleSearch] = useState("");
@@ -451,9 +463,78 @@ export default function ResultCard({
             <p className="text-[10px] font-black text-purple-400 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
               <ClipboardList className="w-3.5 h-3.5 text-purple-400" /> Call Quality Audit Report
             </p>
-            <h3 className="text-xl md:text-2xl font-black text-white tracking-tight leading-tight truncate">
-              {audit.filename}
-            </h3>
+            {isEditingName ? (
+              <div className="flex items-center gap-2 max-w-full">
+                <input
+                  type="text"
+                  value={editedName}
+                  onChange={(e) => setEditedName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      if (editedName.trim() !== "" && editedName.trim() !== audit.filename) {
+                        handleRenameAudit(audit._id, editedName.trim());
+                      }
+                      setIsEditingName(false);
+                    }
+                    if (e.key === "Escape") {
+                      setEditedName(audit.filename);
+                      setIsEditingName(false);
+                    }
+                  }}
+                  autoFocus
+                  className="bg-black/60 border border-purple-500/50 rounded-xl px-3 py-1.5 text-sm font-bold text-white outline-none focus:ring-1 focus:ring-purple-500/50 flex-1 min-w-[200px]"
+                />
+                <button
+                  onClick={() => {
+                    if (editedName.trim() !== "" && editedName.trim() !== audit.filename) {
+                      handleRenameAudit(audit._id, editedName.trim());
+                    }
+                    setIsEditingName(false);
+                  }}
+                  className="p-2 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 rounded-xl text-emerald-400 cursor-pointer transition-all"
+                  title="Save new filename"
+                >
+                  <Check size={14} />
+                </button>
+                <button
+                  onClick={() => {
+                    setEditedName(audit.filename);
+                    setIsEditingName(false);
+                  }}
+                  className="p-2 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/30 rounded-xl text-rose-400 cursor-pointer transition-all"
+                  title="Cancel rename"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 group/report-title">
+                <h3 className="text-xl md:text-2xl font-black text-white tracking-tight leading-tight truncate">
+                  {audit.filename}
+                </h3>
+                <div className="flex items-center gap-1.5 opacity-0 group-hover/report-title:opacity-100 transition-opacity duration-200">
+                  <button
+                    onClick={() => {
+                      setEditedName(audit.filename);
+                      setIsEditingName(true);
+                    }}
+                    className="p-1.5 bg-white/5 hover:bg-purple-650 border border-white/5 hover:border-purple-500/40 rounded-lg text-slate-400 hover:text-white cursor-pointer transition-all"
+                    title="Rename call file"
+                  >
+                    <Edit2 size={12} />
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleDeleteAudit(audit._id);
+                    }}
+                    className="p-1.5 bg-white/5 hover:bg-rose-900/30 border border-white/5 hover:border-rose-500/40 rounded-lg text-slate-400 hover:text-rose-400 cursor-pointer transition-all"
+                    title="Delete audit record"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
           
           <div className="flex flex-wrap items-center gap-3 shrink-0 self-start md:self-auto">

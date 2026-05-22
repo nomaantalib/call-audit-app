@@ -75,6 +75,37 @@ export default function App() {
     });
   };
 
+  const handleRenameAudit = async (id, newName) => {
+    try {
+      const { data } = await axios.patch(`${backendUrl}/api/audit/${id}/rename`, { filename: newName });
+      if (data.success && data.audit) {
+        setHistory((prev) => prev.map((item) => (item._id === id ? { ...item, filename: data.audit.filename } : item)));
+        if (audit?._id === id) {
+          setAudit((prev) => ({ ...prev, filename: data.audit.filename }));
+        }
+      }
+    } catch (err) {
+      console.error("Failed to rename audit:", err);
+      alert(err.response?.data?.error || "Failed to rename audit.");
+    }
+  };
+
+  const handleDeleteAudit = async (id) => {
+    if (!window.confirm("Are you sure you want to permanently delete this audit record?")) return;
+    try {
+      const { data } = await axios.delete(`${backendUrl}/api/audit/${id}`);
+      if (data.success) {
+        setHistory((prev) => prev.filter((item) => item._id !== id));
+        if (audit?._id === id) {
+          setAudit(null);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to delete audit:", err);
+      alert(err.response?.data?.error || "Failed to delete audit.");
+    }
+  };
+
   const formatDate = (d) => {
     if (!d) return "";
     return new Date(d).toLocaleDateString("en-US", {
@@ -153,6 +184,8 @@ export default function App() {
         isPlaying={isPlaying}
         setIsPlaying={setIsPlaying}
         backendUrl={backendUrl}
+        handleRenameAudit={handleRenameAudit}
+        handleDeleteAudit={handleDeleteAudit}
       />
 
       {/* ── STAGE (right panel) ── */}
@@ -268,6 +301,8 @@ export default function App() {
                   isPlaying={isPlaying}
                   setIsPlaying={setIsPlaying}
                   backendUrl={backendUrl}
+                  handleRenameAudit={handleRenameAudit}
+                  handleDeleteAudit={handleDeleteAudit}
                 />
               </div>
             )}
